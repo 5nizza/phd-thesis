@@ -1,0 +1,14 @@
+% !TEX root = table.tex
+\begin{tikzpicture}[node distance=1.5cm,inner sep=1pt,minimum size=0.5mm,->,>=latex]
+
+
+\node[state,initial left] (init) {${init}_A$};
+\node[state] (a_1) [right= of init] {$1_A$};
+
+\path (init) edge [above] node {} (a_1);
+\path (a_1)  [bend left=20] edge [below] node {} (init);
+
+
+
+\end{tikzpicture}
+  

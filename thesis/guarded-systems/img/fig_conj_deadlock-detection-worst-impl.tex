@@ -1,0 +1,32 @@
+\begin{tikzLTS}
+      \tikzstyle{state} = [circle,draw=black,thick,inner sep=1.5pt, text width={width("$\text{T}_{i-1}$")}, align=center]
+      \tikzstyle{boxLabel} = [yshift=-0.4cm]
+      \tikzstyle{every node} = [node distance=3cm]
+    
+    \node[] (ti) {$\dots\dots\dots\dots$};
+    
+    \node[state] (t3) [left of=ti, node distance=2cm] {$b_3$};
+    \node[state] (t2) [left of=t3] {$b_2$};
+    \node[state] (t4) [right of=ti, node distance=2cm] {$b_{i-1}$};
+    \node[state] (t5) [right of=t4] {$b_i$};
+    \node[] (tii) [right of=t5, node distance=1.5cm] {$\dots\dots$};
+
+    \node[state] (t1) [above of=ti] {$b_1$};
+
+
+	\draw (t1) [post, bend right] edge node [above left] (l1) {} (t2);
+	\draw (t1) [post] edge node [above left] (l1) {} (t3);
+	\draw (t1) [post] edge node [above right] (l1) {} (t4);
+	\draw (t1) [post, bend left] edge node [above right] (l1) {} (t5);
+	
+	\draw (t2) [post, loop above] edge node [above] {$\forall{\neg b_2}$} (t2);
+	
+	\draw (t2) [post, bend left] edge node [above] {$\forall{\neg b_3}$} (t3);
+	\draw (t3) [post, bend left] edge node [below] {$\forall{\neg b_3}$} (t2);
+	
+	\draw (t4) [post, bend left] edge node [above] {$\forall{\neg b_i}$} (t5);
+	\draw (t5) [post, bend left] edge node [below] {$\forall{\neg b_i}$} (t4);
+
+ 	 \node (U2) [draw=black, fit=(t1) (t2) (tii), inner sep=0.75cm] {};
+ 	 \node [boxLabel] at (U2.north) {Template $B$};
+\end{tikzLTS}

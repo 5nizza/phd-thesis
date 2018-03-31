@@ -1,0 +1,54 @@
+\section{Experiments} \label{gua:sec:experiments}
+
+(The experiments were done by S. Au{\ss}erlechner,
+ as a part of his Master Thesis.)
+
+We used our new cutoff results in the context of parameterized synthesis to 
+automatically construct process templates with safety and liveness guarantees 
+for guarded systems with an arbitrary number of components.
+Our prototype is an extension of the parameterized synthesis tool 
+{\sc Party}~\cite{party}.
+It synthesizes process templates based on the semi-decision procedure 
+described in Section~\ref{gua:sec:paramsynt}. 
+Bounded template synthesis is 
+implemented as an extension of the bounded synthesis approach~\cite{BS}, with
+LTL3BA~\cite{LTL3BA} for translation of specifications to automata, and
+SMT solver Z3~\cite{Moura08} as backend. 
+
+%In the cutoff detection step, we apply the cutoff results from 
+%Section~\ref{gua:sec:cutoffs} modularly, i.e., we calculate cutoffs and convert 
+%to universal co-Büchi tree automaton (UCT)\sj{remind/use long version} for every conjunct of the specification separately (an optimization 
+%mentioned in~\cite{KhalimovJB13b}). Finally, we produce the SMT encoding, 
+%conjoining the SMT constraints for all parts. 
+%
+As a proof of concept, we synthesized implementations for two small 
+examples (on a single core of a 3.5GHz Intel i7 CPU with 4GB RAM):
+\begin{itemize}
+\item a closed disjunctive system $\largesys$ where $A$ controls an output 
+signal $w$, and every $B_i$ a signal $g_i$, with fairness assumption and specification
+$\GF(\neg w) \wedge \GF w \wedge 
+\bigwedge_{i} \left[\GF(w \wedge g_i) \wedge  \GF g_i \wedge \GF(\neg g_i) 
+\right]$,
+i.e., all processes must toggle their signals 
+infinitely often, and every process $B^i$ must ``meet'' infinitely often with 
+$A$ when both signals are enabled. The implementation below has been synthesized with a cutoff of $2\card{B}+1-1=4$ for the property and $2\card{B}-1=3$ for the deadlock detection within one minute.
+
+\item an open conjunctive system $(B)^{(n)}$ (i.e., $A$ can be arbitrary and $B$ does not react to it), where each process $B_i$ gets requests of high and low priority as input ($rh_i, rl_i$), and controls ouputs that represent grants to these requests ($gh_i, gl_i$). The specification requires i) `every request $rh$ should eventually be granted ($gh_i$)', ii) `every request $rl_i$ should eventually be granted ($gl_i$) unless there is a simultaneous request $rh_i$', iii) `there should be no spurious grants', iv) `mutual exclusion of grants (locally and globally)'. The implementation above has been synthesized with a cutoff of $3$ for properties, and $4$ for deadlock detection within about $45$ minutes. Note that we do not restrict the implementation to $1$-conjunctive systems, and therefore the cutoff does not guarantee absence of local deadlocks in systems of arbitrary size.
+\end{itemize}
+
+\begin{figure}[ptb]
+\centering
+\begin{subfigure}[b]{0.45\textwidth}\center
+\scalebox{0.7}{\input{guarded-systems/img/disjunctive_lts}}
+\caption{Disjunctive system}
+\label{fig:disjunctiveLTS}
+\end{subfigure}
+\begin{subfigure}[b]{0.45\textwidth}\center
+\scalebox{0.7}{\input{guarded-systems/img/mutual_exclusion3_lts}}
+\label{fig:conjunctiveLTS3}
+% \caption{Templates $(A,B)$ used to prove the tightness of the cutoffs for properties $\pexists h(A^1,B^1)$ (Observation~\ref{obs:disj:tight_prop})\ak{check me}.}
+\label{fig:experiments}
+\caption{Conjunctive system}
+\end{subfigure}
+\caption{Synthesized systems}
+\end{figure}

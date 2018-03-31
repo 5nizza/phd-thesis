@@ -1,0 +1,29 @@
+% !TEX root = table.tex
+\begin{tikzpicture}[node distance=1.8cm,inner sep=1pt,minimum size=0.5mm,->,>=latex]
+
+
+\node[state,double] (b_1) {$b_1$};
+\node[state] (b_2) [right of=b_1] {$b_2$};
+\node (dots) [right of=b_2] {$\ldots$};
+\node[state] (b_k) [right of=dots] {$b_k$}; 
+\node[state] (sink) [below of=b_1] {sink};
+\node[state] (r) [below of=b_2] {$r$};
+
+\path (b_1) edge [above] node {$\disj{b_1}$} (b_2);
+\path (b_2) edge [above] node {$\disj{b_2}$} (dots);
+\path (dots) edge [above] node {$\disj{b_{k-1}}$} (b_k);
+% \path (b_1) edge [left] node {$\disj{b_1}$} (sink);
+\path (b_2) edge [right] node {$\disj{b_2}$} (r);
+\path (r) edge [below] node {$\disj{b_k}$} (sink);
+\path (b_k) edge [bend left=15] node {} (r);
+
+\path (b_1) [loop above] edge [right] node {} (b_1);
+\path (b_2) [loop above] edge [right] node {} (b_2);
+\path (b_k) [loop above] edge [right] node {$\disj{b_k}$} (b_k);
+\path (sink) [loop below] edge [right] node {} (sink);
+\path (r) [loop below] edge [right] node {} (r);
+
+% \path (b_1) edge [below, bend right=25] node {} (b_k);
+% \path (b_2) edge [below, bend right=15] node [near start] {$\disj{b_{k}}$} (b_k);
+
+\end{tikzpicture}

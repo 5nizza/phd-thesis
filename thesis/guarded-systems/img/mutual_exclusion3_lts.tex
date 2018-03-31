@@ -1,0 +1,18 @@
+\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1.5cm,
+                    semithick]
+  \tikzstyle{every state}=[align=center, anchor=center]
+  \tikzstyle{every edge} = [align=center,draw=black,]
+
+  \node[state] (A) [label={below:$$}] {$0_A$};
+  \node[] (BC) [below of=A] {$$};
+  \node[state] (B) [left of=BC, label={below:$gh$}] {$1_A$};
+  \node[state] (C) [right of=BC, label={below:$gl$},] {$2_A$};
+
+
+  \path 
+  (A) edge [loop above] node {$\neg rh \wedge \neg rl : \forall \{0_A\}$} (A)
+  (A) edge [left, bend right=10] node {$rh: \forall \{0_A\}$} (B)
+  (B) edge [right, pos=0.3, bend right=10] node {$*: \forall \{0_A\}$} (A)
+  (A) edge [right, bend left=10] node {$\neg rh \wedge rl: \forall \{0_A\}$} (C)
+  (C) edge [right, bend left=10] node {$$} (A);
+\end{tikzpicture}

@@ -1,0 +1,17 @@
+%!TEX root = table.tex
+\begin{tikzpicture}[node distance=2.1cm,inner sep=1pt,minimum size=0.5mm,->,>=latex]
+
+
+\node[initial below, state] (a_1) {$1_A$};
+\node (dots) [right of=a_1] {$\ldots$};
+\node[state] (a_all) [right of=dots] {${all}_A$};
+\node[state] (a_end) [right of=a_all] {${end}_A$};
+
+
+\path (a_1) edge [above] node {$\disj{1_B}$} (dots);
+\path (dots) edge [above] node {$\disj{{\card{B}}_B}$} (a_all);
+\path (a_all) edge [above] node {$\disj{3_B}$} (a_end);
+
+
+
+\end{tikzpicture}

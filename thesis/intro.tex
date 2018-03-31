@@ -1,0 +1,420 @@
+\chapter{Introduction}
+
+%\parbf{What is reactive synthesis?}
+{\small
+\noindent
+\li
+\-[Dave:~] Hey, Elli, how can I calculate the week number from the date?
+\vspace{-3mm}
+\-[Elli:~] ...prints the C-function.
+\vspace{-3mm}
+\-[Dave:~] Great. Can this function also output three last requested dates?
+\vspace{-3mm}
+\-[Elli:~] ...prints another C-function.
+\vspace{-3mm}
+\-[Dave:~] Thanks. Can you also make it output the name of the requesting person?
+\vspace{-3mm}
+\-[Elli:~] I am sorry, Dave, I am afraid I can't do that.
+\il
+}
+
+In synthesis,
+we describe the required behaviour and ask the computer to find the solution
+with such a behaviour.
+(In the dialog above,
+ Dave asks Elli to find a function that,
+ given a date, outputs the week number to which the date belongs.)
+In \emph{reactive} synthesis, we are interested not in simple ``do-and-forget'' functions,
+but rather in functions that interact with the user
+akin to functions with an internal state.
+(In the dialog above, the second C-function is reactive.)
+It is not always possible to find a solution,
+in which case the synthesizer (Elli) outputs ``specification is unrealizable''.
+(In the last dialogue request, the specification became unrealizable,
+ because the person name is not available to the function to be synthesized.)
+%To summarise, reactive synthesis is an automatic way
+%to translate a human intention expressed in some language
+%into a system of some kind.
+
+%\parbf{What is reactive synthesis problem?}
+
+In 1963, Alonzo Church introduced the reactive synthesis problem~\cite{Church63}:
+given a formula in Monadic Second Order Logic of One Successor,
+and the inputs and the outputs of a circuit,
+find such a circuit such that all behaviors of the circuit satisfy the formula.
+(The circuit behaviour is an infinite string of inputs combined with the outputs.)
+Church's problem was solved by Rabin~\cite{Rabin69} and
+by B\"uchi and Landweber~\cite{BL69} in 1969.\ak{how?}
+
+%\parbf{Recent progress of reactive synthesis}
+
+Recent research in reactive synthesis focused on specifications
+given in Linear Temporal Logic (LTL),
+introduced by Pnueli~\cite{pnueli1977temporal} in 1977.
+LTL has temporal operators, like $\G$ (always) and $\F$ (eventually),
+and allows one to state properties like ``every request is eventually granted'':
+$\G(r \impl \F g)$.
+A system satisfies a given LTL property if all its computations satisfy it.
+Pnueli and Rosner proved~\cite{DBLP:conf/popl/PnueliR89}
+that the LTL synthesis problem is 2EXPTIME-complete.
+Their approach translates a given LTL formula into a nondeterministic B\"uchi automaton,
+then determinises it into a deterministic parity automaton
+with the aid of involved Safra construction~\cite{Safra},
+turns the automaton into a game, and solves the game.
+Recent research focused on how to overcome the high complexity and Safra construction:
+the work~\cite{Bloem12} considered the synthesis for a subset of LTL called GR(1),
+the work~\cite{BS,KupfermanV05} considered bounding the system size and gave a name to Bounded Synthesis,
+by combining the previous bounding with efficient data structures---Anti-chains Synthesis~\cite{Filiot11}.
+The SYNTCOMP competition~\cite{syntcomp} is another recent initiative
+with the goal to advance efficient synthesisers and popularise reactive synthesis.
+
+%\parbf{The issues with reactive synthesis}
+
+Despite substantial progress,
+reactive synthesis is not as widespread as model checking.
+The major reason, I believe,
+is that writing the specifications---especially \emph{complete} specifications---is hard.
+The issue is less pronounced in model checking,
+because we do not need all the properties,
+only those to model check.
+
+%\parbf{In light of this issue, two directions to proceed}
+
+In light of this issue, there are two directions to proceed.
+First, we can develop synthesis approaches for richer logics,
+which can ease writing the specifications.
+Second, we can find application contexts where high specification costs are acceptable.
+This thesis targets both directions:
+we develop new synthesis approaches for the logic called \CTLstar,
+and we delve into synthesis of distributed algorithms.
+
+\subsection*{Part I: Excursion into Branching Logic}
+
+%\parbf{when was CTL introduced?}
+
+Computation Tree Logic (CTL)~\cite{ctl-origin}
+was introduced by Emerson and Clarke in 1981
+to circumvent the high complexity (PSPACE-complete) of the LTL model checking problem
+and to be able to specify structural properties.
+In 1986 Emerson and Halpern introduced a generalization,
+Computation Tree Star Logic (\CTLstar)~\cite{ctlstar-origin},
+that subsumes both CTL and LTL.
+
+%\parbf{what is \CTLstar?}
+
+In contrast to LTL, which reasons about (linear) computation runs,
+\CTLstar reasons about (branching) computation trees.
+We can get such a tree by unfolding the system transition structure.
+\CTLstar has---in addition to temporal operators---path quantifiers:
+$\A$ (on all paths) and $\E$ (there exists a path).
+Such path quantifiers allow us to reason about branching structure of trees,
+not just about their ``linear'' paths.
+For example, \CTLstar formula ``$\AGEF reset$'' says:
+``on all tree paths, from every tree node,
+  there should be a path into a node where `reset' holds''.
+We cannot express such a property using LTL alone.
+
+%\parbf{what advantages does CTL* have over LTL?}
+
+Despite \CTLstar being more expressible than LTL,
+the complexity of \CTLstar synthesis (2EXPTIME-complete)
+stays the same.
+This prompted us to look into approaches to \CTLstar synthesis.
+
+%\parbf{what is the standard solution to CTL*?}
+
+The standard solution~\cite{informatio} to \CTLstar synthesis
+turns the \CTLstar formula into an alternating hesitant tree automaton,
+removes nondeterminism and derives a universal co-B\"uchi tree automaton,
+determinises it using Safra construction~\cite{Safra} into a parity tree automaton,
+and, finally, checks its non-emptiness.
+If it is empty, then the specification is unrealisable,
+otherwise we can extract the system from the proof of the non-emptiness.
+This approach is hard to implement correctly and efficiently,
+due to the involved Safra construction%
+\footnote{It was a common belief that the Safra construction
+  is difficult to implement and results in impractical algorithms.
+  However, the belief might be wrong,
+  as SYNTCOMP~\cite{syntcomp} in 2017 showed:
+  the LTL synthesiser {\tt ltl-synt} that used Safra construction performed very well.}.
+
+%\parbf{what is our contribution to CTL* synthesis?}
+
+Part I contribution is two practical approaches to \CTLstar synthesis.
+
+\subsubsection*{Contribution I.1: \CTLstar Bounded Synthesis}
+
+We developed two bounded synthesis approaches for the \CTLstar specifications.
+Let us recall how the SMT-based bounded synthesis by Schewe and Finkbeiner~\cite{BS} works:
+we bound the system size, and
+encode the resulting synthesis problem into an SMT query\footnote{%
+  Satisfiability Modulo Theory (SMT)~\cite{SMT} query is a
+  set of constraints over in a given theory.
+  For example, in Linear Integer Arithmetic theory,
+  the constraints talk about integer variables,
+  use operations plus, minus, and the comparison relations.
+  Such a query asks whether there are values for integer variables
+  that make the constraint true.}.
+The query encodes the model checking question:
+whether a system---which is yet unknown---is accepted by the automaton.
+Bounding the system size makes it possible to encode such a model checking query
+into an SMT query.
+To solve such a query,
+an SMT solver efficiently enumerates every possible system of a given size,
+and checks if it is correct.
+Thus, if the SMT query is satisfiable, then we extract the system (of the given size),
+otherwise increase the system size and repeat.
+The loop stops when the bound on the system size%
+---provided by the user or from the theory---is reached.
+
+Our first bounded synthesiser for \CTLstar
+resembles bottom-up \CTLstar model checking~\cite{PrinciplesMC}:
+it introduces an atom for each subformula of the \CTLstar formula,
+and encodes into an SMT query whether the atom holds in a system state,
+for every state.
+We also require the top-level atom, representing the whole \CTLstar formula,
+to hold in the initial system state,
+Hence, if the SMT query is satisfiable,
+then there is a system of the given size,
+which satisfies the \CTLstar formula.
+Otherwise, increase the system size and repeat.
+
+Our second bounded synthesiser for \CTLstar uses the automata framework~\cite{ATA}:
+translate the \CTLstar formula into an alternating hesitant automaton,
+then encode into an SMT query
+whether there is a system of a given size that is accepted by the automaton.
+Conceptually, the approach is the same as the previous one,
+except that we do not introduce atoms for subformulas explicitly
+and instead use their automata representation.
+
+The results constitute Chapter~\ref{chap:bosy:ctlstar} and were published in:
+\li
+\-[\cite{CTLstarCAV}]
+   \emph{Bounded Synthesis for Streett, Rabin, and \CTLstar},
+   by Ayrat Khalimov and Roderick Bloem,
+   at CAV conference, 2017
+\il
+
+\subsubsection*{Contribution I.2: \CTLstar-via-LTL Synthesis}
+
+We reduce synthesis for \CTLstar properties to synthesis for LTL.
+In the context of model checking this is impossible%
+---\CTLstar is more expressive than LTL.
+Yet, in synthesis we have knowledge of the system structure
+\emph{and} we can add new outputs.
+These outputs can be used to encode witnesses of
+the satisfaction of \CTLstar subformulas directly into the system.
+This way, we construct an LTL formula, over old and new outputs and original inputs,
+which is realisable if, and only if, the original \CTLstar formula is realisable.
+The \CTLstar-via-LTL synthesis approach preserves the problem complexity,
+although it might produce systems that are larger than necessary.
+Furthermore,
+the approach directly benefits from the performance advances of LTL synthesisers.
+The results constitute Chapter~\ref{chap:ctl-via-ltl} and were published in:
+\li
+\-[\cite{CTLsynt-via-LTLsynt}]
+  \emph{\CTLstar Synthesis via LTL Synthesis},
+  by Roderick Bloem and Sven Schewe and Ayrat Khalimov,
+  at SYNT workshop, 2017
+\il
+
+
+\subsection*{Part II: Excursion into Parameterized Systems}
+
+%\parbf{why do we consider parameterized systems?}
+
+Modern systems become more and more distributed.
+Distributed systems are hard to implement and even harder to debug.
+Yet, the failure of such systems may be unacceptable.
+Thus, substantial efforts are devoted to ensure the correctness of distributed systems.
+In Part II,
+we look into the hard task of automatic synthesis of distributed parameterized systems.
+
+%\parbf{what is the parametrized synthesis problem?}
+
+Most distributed systems, algorithms, and data structures are \emph{parameterized}:
+they should work for a varied, not a priori fixed, number of the components.
+%We call such systems parameterized (by the number of components).
+The parameterized synthesis problem~\cite{JB14} asks, given
+a parameterized specification, to find a process template,
+that can be cloned to form a correctly behaving system of any size.
+An example parameterized specification is:
+\[ \begin{array}{ll}
+  \forall i \neq j.~ & \G \neg ( g_i \land g_j ) \land \\
+  \forall i.~ & \G (r_i \impl \F g_i).
+  \end{array}
+\]
+The synthesizer should find a process template, having input $r$ and output $g$,
+such that a system composed of any number of such processes,
+satisfies the above specification.
+The related question is that of parametrized model checking
+where the process template is given.
+The intrinsic parameter,
+hidden in the parameterized synthesis problem,
+is how the processes are connected and how they communicate,
+i.e., the system architecture.
+The survey of existing cutoff and decidability results
+for many different system architectures can be found in~\cite{BloemETAL15}.
+We focus on two system architectures: guarded systems and token-ring systems.
+
+%\parbf{what is the standard solution to parameterized synthesis problem?}
+
+A common approach to solve the parameterized synthesis and model checking problems
+is to use the cutoff reduction~\cite{Emerso03}:
+reduce reasoning about systems with an arbitrary number of processes
+to reasoning about systems of a fixed cutoff size.
+For example,
+if we consider the parameterized specification mentioned above and token-ring systems,
+then it is enough to consider a system with 4 processes:
+if it is correct, then any larger system is correct.
+
+%\parbf{what is our contribution?}
+
+\subsubsection*{Contribution II.1: Cutoffs for Parameterized Guarded Systems}
+
+Guarded systems~\cite{EmersonK03} are inspired by cache coherence protocols found
+in most modern processors.
+A cache coherence protocol is usually described by states,
+where transitions between states happen depending on whether or not
+there is a processor in a particular state.
+I.e., the transitions are guarded.
+Inspired by this, in guarded systems,
+processes transitions are enabled or disabled depending
+on the existence of other processes in certain local states.
+Our contribution concerns both parameterized synthesis and parameterized verification.
+Our work stems from the observation that
+existing cutoff results for guarded systems
+(i) are restricted to closed systems, and
+(ii) are of limited use for liveness properties
+because reductions do not preserve fairness.
+We close these gaps and obtain new cutoff results for open systems with
+liveness properties under fairness assumptions.
+Furthermore, we obtain cutoffs for the detecting deadlocks,
+which are of paramount importance in synthesis.
+Finally, we prove tightness or asymptotic tightness for the new cutoffs.
+The results constitute Chapter~\ref{chap:guarded-systems}
+and were published in:
+\li
+\-[\cite{AJK16}]
+   \emph{Tight Cutoffs for Guarded Protocols with Fairness},
+   by Simon Au{\ss}erlechner and Swen Jacobs and Ayrat Khalimov,
+   at VMCAI conference, 2016
+\il
+
+%\parbf{what is the problem with the existing parameterized synthesis?}
+
+\subsubsection*{Contribution II.2: Case Study of Parameterized Token-ring AMBA}
+
+In token-ring systems, a single token circulates in the system.
+A process possessing the token knows that no other process has the token.
+Based on this information, the process can, for example, raise the grant signal.
+If all processes raise the grant only when they posses the token,
+then the grants will be mutually exclusive.
+Thus, the token serves as the resource token.
+
+The experiments with the existing parameterized synthesis method~\cite{JB14}
+showed that it does not scale to large specifications.
+First, we optimize the method by refining the cutoff reduction.
+The experiments show speed-ups of several orders of magnitude.
+Second, we perform parameterized synthesis case study
+on the industrial arbiter protocol AMBA~\cite{AMBAspec}.
+We describe new cutoff extension and decompositional synthesis tailored to AMBA
+that, together with the previously mentioned optimizations,
+allowed us to synthesize AMBA in parameterized setting, for the first time.
+The results constitute Chapter~\ref{chap:token-systems}
+and were published in:
+\li
+\-[\cite{Khalimov13}]
+   \emph{Towards Efficient Parameterized Synthesis},
+   by Ayrat Khalimov and Swen Jacobs and Roderick Bloem,
+   at VMCAI conference, 2013
+\-[\cite{party}]
+   \emph{PARTY: Parameterized Synthesis of Token Rings},
+   by Ayrat Khalimov and Swen Jacobs and Roderick Bloem,
+   at CAV conference, 2013
+\-[\cite{BJK14}]
+   \emph{Parameterized Synthesis Case Study: AMBA AHB},
+   by Ayrat Khalimov and Swen Jacobs and Roderick Bloem,
+   at SYNT workshop, 2014
+\il
+
+\subsection*{Other Results}
+
+Here are the results that did not make their way into the thesis:
+\li
+\-[\cite{BloemETAL15}]
+   \emph{Decidability of Parameterized Verification},
+   book of 170 pages,
+   by Roderick Bloem and
+               Swen Jacobs and
+               Ayrat Khalimov and
+               Igor Konnov and
+               Sasha Rubin and
+               Helmut Veith and
+               Josef Widder.\\
+In this book we consider the important case of systems parameterized by the number of processes in the system
+and where each process is independent of that number.
+The literature in this area produced a wealth of computational models for systems based on token passing,
+broadcast communication, guarded transitions, and other communication primitives.
+We introduce a computational model that unites the central synchronization and
+communication primitives of many models.
+We survey existing decidability and undecidability results,
+and provide a systematic overview of the basic problems in this research area.
+
+
+\-[\cite{DBLP:journals/sigact/BloemJKKRVW16}]
+   \emph{Decidability in Parameterized Verification},
+   the journal version of the above book; appeared in SIGACT News in 2016.
+
+\-[\cite{DBLP:journals/corr/Khalimov16}]
+   \emph{Specification Format for Reactive Synthesis Problems},
+   by Ayrat Khalimov,
+   at SYNT workshop, 2015.\\
+To do synthesis, we need a specification.
+Writing specifications is hard.
+In this paper, we propose a user-friendly format to ease
+the specification work, in particularly, that of specifying partial implementations.
+Also, we provide scripts to convert specifications in the new format into the SYNTCOMP format,
+thus benefiting from state of the art synthesizers.
+
+\-[\cite{AJKR14}]
+   \emph{Parameterized Model Checking of Token-Passing Systems},
+   by Benjamin Aminof and
+               Swen Jacobs and
+               Ayrat Khalimov and
+               Sasha Rubin,
+   at VMCAI conference, 2014.\\
+In this paper, we revisit the parameterized model checking problem for token-passing
+systems and specifications in indexed $\CTLstarmX$.
+%In foundational work, Emerson and Namjoshi (1995, 2003) showed that
+%parameterized model checking of indexed \CTLstarmX in uni-directional token rings
+%can be reduced to checking rings up to some cutoff size.
+%Clarke et al. (2004) showed a similar result for general topologies and indexed \LTLmX,
+%provided processes cannot choose the directions for sending or receiving the token.
+We unify and substantially extend the results of Emerson and Namjoshi~\cite{Emerso95b,Emerso03}
+and Clarke et al.~\cite{Clarke04c}
+by systematically exploring fragments of indexed \CTLstarmX with respect to general network topologies.
+For each fragment we establish whether a cutoff exists,
+and for some concrete topologies, such as rings, cliques and stars, we infer small cutoffs.
+Finally, we show that the problem becomes undecidable, and thus no cutoffs exist,
+if processes are allowed to choose the directions in which they send or from which they receive the token.
+
+\-[\cite{2017arXiv171204291K}]
+  \emph{OpenSEA: Semi-Formal Methods for Soft Error Analysis},
+  by Patrick Klampfl and Robert K\"onighofer and Roderick Bloem and Ayrat Khalimov and
+  Aiman Abu-Yonis  and Shiri Moran,
+  on arxiv, 2017.\\
+Due to alpha-particles and cosmic rays, modern circuits are prone to bit flips.
+To alleviate the problem, designers develop protection circuits,
+but they are hard to implement right.
+This leads to bugs: an undetected fault can bring miscalculations,
+the protection that alarms about harmless faults incurs performance penalty.
+In this paper, we use formal methods on designer’s input tests, while keeping time-location open.
+This idea is at the core of the tool OpenSEA.
+OpenSEA can
+(i) find latches vulnerable to and protected against faults,
+(ii) find tests that exhibit checker false alarms,
+(iii) use fixed and open inputs, and
+(iv) use environment assumptions.
+Evaluation on a number of industrial designs shows that OpenSEA produces valuable results.
+\il

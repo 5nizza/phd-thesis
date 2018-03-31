@@ -1,0 +1,100 @@
+\section{Introduction}
+\label{gua:sec:intro}
+
+% Motivation: (synthesis is especially valueable in concurrent settings)
+Concurrent hardware and software systems are notoriously hard to get right.
+Formal methods like model 
+checking or synthesis can be used to guarantee correctness, but the state explosion 
+problem prevents us from using such methods for systems with a large number 
+of components. Furthermore, correctness properties are often expected to hold 
+for an \emph{arbitrary} number of components. Both problems can be solved by 
+\emph{parameterized} model checking and synthesis approaches, which give correctness 
+guarantees for systems with any number of components without considering every 
+possible system instance explicitly.
+
+While parameterized model checking (PMC) is undecidable in general~\cite{Suzuki88}, 
+there exists a number of methods that decide the problem for specific classes 
+of systems~\cite{German92,Emerson00,Emerso03}, as well as semi-decision 
+procedures that are successful in many interesting 
+cases~\cite{Kurshan95,Clarke08,KaiserKW10}.
+In this chapter, we consider the \emph{cutoff} method that can guarantee properties of 
+systems of arbitrary size by considering only systems of up to a certain 
+fixed size, thus providing a decision procedure for PMC if components are finite-state.
+
+We consider systems that are composed of an arbitrary number of processes,
+each an instance of a process template from a given, finite set.  
+Process templates can be viewed as synchronization 
+skeletons~\cite{EmersonC82}, i.e., program abstractions that suppress information not 
+necessary for synchronization. In our system model, processes communicate by guarded updates, 
+where guards are statements about other processes that are interpreted either 
+conjunctively (``every other process satisfies the guard'') or disjunctively 
+(``there exists a process that satisfies the guard''). Conjunctive guards can 
+model atomic sections or locks, disjunctive guards can model token-passing or to some extent pairwise rendezvous (cf.~\cite{EmersonK03}). 
+
+This class of systems has been studied by Emerson and 
+Kahlon~\cite{Emerson00}, and cutoffs that depend on the 
+size of process templates are known for specifications of the form 
+$\forall{\bar{p}}.\ \spec(\bar{p})$, 
+where $\spec(\bar{p})$ is an $\LTLmX$ property over the local states of one or more processes 
+$\bar{p}$. Note that this does not allow us to specify fairness 
+assumptions, for two reasons: (i) to specify fairness, additional atomic propositions for enabledness and scheduling of processes are needed, and (ii) specifications with global fairness assumptions are of the form 
+$(\forall{\bar{p}}.\ \fair(\bar{p})) \impl (\forall{\bar{p}}.\ \spec(\bar{p}))$.
+Because neither is supported by \cite{Emerson00}, the existing cutoffs are of 
+limited use for 
+reasoning about liveness properties. 
+
+Emerson and Kahlon~\cite{Emerson00} mentioned this limitation and illustrated it
+using the process template on the figure on the right.
+Transitions from the initial state $N$
+\begin{wrapfigure}{r}{0.28\linewidth}
+\vspace{-9pt}
+\scalebox{0.84}{
+\input{guarded-systems/img/mutex}
+}
+\label{fig:mutex}
+\vspace{-20pt}
+\end{wrapfigure}
+to the ``trying'' state $T$, and from the critical state $C$ to $N$ are always 
+possible, while the transition from $T$ to $C$ is only possible if no other 
+process is in $C$. The existing cutoff results can be 
+used to prove safety properties like mutual exclusion for systems composed of 
+arbitrarily many copies of this template. However, they cannot be used to prove 
+starvation-freedom properties like 
+$\forall{p}. \pforall \always (T_p \rightarrow \eventually C_p)$,
+stating that every process $p$ that enters its local state $T_p$ will 
+eventually enter state $C_p$, because without fairness 
+of scheduling the property does not hold. 
+
+Also, Emerson and Kahlon~\cite{Emerson00} consider only closed systems. 
+Therefore, in this example, processes always try to enter $C$. 
+In contrast, in open systems the transition to $T$ might be a reaction 
+to a corresponding input from the environment that makes entering $C$ necessary. While it is possible to convert an open system to a closed system that is equivalent under \LTL\ properties, this comes at the cost of a blow-up.
+
+\smallskip
+\noindent {\bf Motivation.} Our work is inspired by applications in
+parameterized synthesis~\cite{JB14}, where the goal is to automatically
+construct process templates such that a given specification is satisfied in
+systems with an arbitrary number of components.
+In this setting,
+one generally considers \emph{open systems} that interact with an uncontrollable environment (user).
+Also, most specifications contain liveness properties that cannot be guaranteed without fairness assumptions.
+Note that in the parameterized setting liveness properties cannot be reduced to safety properties,
+because the size of a system is not bounded a priori.
+Finally, we are interested in synthesizing deadlock-free systems.
+\emph{Cutoffs} are essential for parameterized synthesis,
+because they enable a semi-decision procedure to parameterized synthesis.
+
+\smallskip
+\noindent
+{\bf Contributions.}
+\begin{itemize}
+\item We show that existing cutoffs for model checking of $\LTLmX$ properties are in general not sufficient for systems with \emph{fairness assumptions}, and provide new cutoffs for this case.
+\item We improve some of the existing cutoff results, and give separate cutoffs for the problem of \emph{deadlock detection}, which is closely related to fairness. 
+\item We prove \emph{tightness} or asymptotical tightness for all of our cutoffs, showing that smaller cutoffs cannot exist with respect to the parameters we consider.
+\end{itemize}
+%
+Moreover, all of our cutoffs directly support \emph{open systems}, where each process may communicate with an adversarial environment. This makes the blow-up incurred by translation to an equivalent closed system unnecessary. 
+Finally,
+we will show in Sect.~\ref{gua:sec:paramsynt}
+how to integrate our size-dependent cutoffs into the parameterized synthesis approach.
+%The results presented here are based on a more detailed preliminary version of this paper~\cite{AJK15}.

@@ -1,0 +1,41 @@
+% !TEX root = table.tex
+\begin{tikzpicture}[->,>=latex,
+node distance = 1cm,
+% minimum size = 5mm,
+% inner sep=1mm,
+% baseline,
+bend angle=45]
+
+\tikzset{every state/.style={minimum size=0.8cm, inner sep=1mm}}
+
+\tikzset{every state/.append style={font=\Large}}
+\tikzset{every label/.append style={font=\Large}}
+
+\node[state] (a) {$a$};
+\node[state,fill=red] (b) [above right= of a] {$b$};
+\node[state,fill=green] (b') [below right= of a] {$b'$};
+\node[state] (a') [above right= of b'] {$a'$};
+\node[inner sep=-2mm,ellipse,draw,fit=(a) (a') (b) (b'), label=45:{$r_1$}] {};
+\node (invisible) [above=1cm of b]{};
+
+\path (invisible) edge (b);
+\path (a) edge (a');
+% \path (b) edge (b');
+% \path (b') edge [out=270, in=180] (a);
+
+\draw 
+(b') .. controls ($(b')+(0,-1.5)$) .. 
+($(b')+(-1,-1.5)$) .. controls ($(b')+(-2.65,-1.5)$) ..
+($(a) + (-1.3,-1)$) .. controls ($(a) + (-1.3,0)$) ..
+(a);
+
+% \draw (b') .. controls ($(b')+(0,1)$) .. node [right, xshift=4pt] {$\eINC'$} ($(a) + (-1,0)$) .. controls ($(con) + (3.45,0)$) .. (con);
+
+
+\node[state] (x) [right=3cm of a'] {$x$};
+\node (x') [right= of x] {};
+\node[inner sep=0mm,ellipse,draw,fit=(x) (x'), label=60:{$r_2$}] {};
+
+\path (a') edge (x);
+
+\end{tikzpicture}

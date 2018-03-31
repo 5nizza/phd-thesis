@@ -1,0 +1,16 @@
+\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=2cm,
+                    semithick]
+  \tikzstyle{every state}=[align=center, anchor=center]
+  \tikzstyle{every edge} = [align=center,draw=black,]
+
+  \node[state] (A) [label={below:$$}] {$a^0$};
+  \node[state] (B) [below left of=A, label={below:$g_1$},] {$a^1$};
+  \node[state] (C) [below right of=A, label={below:$g_2$},] {$a^2$};
+
+
+  \path 
+  (A) edge [loop above] node {$\neg r : \{a^0\}$} (A)
+  (A) edge [left, above left] node {$r: \{a^0\}$} (B)
+  (B) edge [right, above] node {$*: \{a^0\}$} (C)
+  (C) edge [right, above right] node {$*: \{a^0\}$} (A);
+\end{tikzpicture}

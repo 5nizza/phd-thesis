@@ -1,0 +1,41 @@
+\[
+{\footnotesize
+\begin{array}{rrlr}
+\multicolumn{3}{l}{\mathrm{Assumptions:}} \\[2pt]
+& \always & (\hmastlock \land \hburst = \hincr) \rightarrow \nextt \eventually \neg \hbusreqi[\hmaster] & (A1)\\[3pt]
+& \always \eventually & \hready & (A2) \\[3pt]
+\forall \mathrm i: & \always & \hlocki \rightarrow \hbusreqi & (A3) \\[3pt]
+\forall \mathrm i: & & \neg \hbusreqi \land \neg \hlocki \land \neg \hready & (A4) \\[3pt]
+\multicolumn{3}{l}{\mathrm{Guarantees:}} \\[2pt]
+& \always & \neg \hready \rightarrow \nextt \neg \hstart & (G1) \\[3pt]
+& \always & (\hmastlock \land \hburst = \hincr \land \hstart)\\
+& & ~\rightarrow \nextt (\neg \hstart \weakuntil (\neg \hstart \land \hbusreqi[\hmaster])) & (G2) \\[3pt]
+& \always & (\hmastlock \land \hburst = \hburstfour \land \hstart \land \hready)\\
+& & ~\rightarrow \nextt (\neg \hstart \weakuntil[3] (\neg \hstart \land \hready)) & (G3.1) \\[3pt]
+& \always & (\hmastlock \land \hburst = \hburstfour \land \hstart \land \neg \hready)\\
+& & ~\rightarrow \nextt (\neg \hstart \weakuntil[4] (\neg \hstart \land \hready)) & (G3.2) \\[3pt]
+\forall \mathrm i: & \always & \hready \rightarrow (\hgranti \leftrightarrow \nextt (\hmaster = {\mathrm i})) & (G4)\\[3pt]
+& \always & \hready \rightarrow (\hlocked \leftrightarrow \nextt (\hmastlock)) & (G5)\\[3pt]
+\forall \mathrm i: & \always & \nextt \neg \hstart \impl \left(
+\begin{array}{ll}
+ & (\hmaster = {\mathrm i} \leftrightarrow \nextt (\hmaster = {\mathrm i}))\\
+\land & (\hmastlock \leftrightarrow \nextt \hmastlock)
+\end{array}
+ \right) & (G6)\\[3pt]
+\forall \mathrm i: & \always & (\hdecide \land \nextt \hgranti) \rightarrow (\hlocki \leftrightarrow \nextt (\hlocked)) & (G7)\\[3pt]
+
+\forall \mathrm i: & \always & \neg \hdecide\ \impl \left(
+\begin{array}{ll}
+       & \hgranti \leftrightarrow \nextt \hgranti \\
+ \land & \hlocked \leftrightarrow \nextt \hlocked
+\end{array}
+\right) & (G8)\\[3pt]
+
+% \forall \mathrm i: & \always & \neg \hdecide\ \impl \left( (\hgranti \leftrightarrow \nextt \hgranti) \land (\hlocked \leftrightarrow \nextt \hlocked) \right) & (G8)\\[3pt]
+\forall \mathrm i: & \always & \hbusreqi \impl \eventually (\neg
+\hbusreqi \lor \hmaster = \mathrm i) & (G9)\\[3pt]
+\forall \mathrm i\neq 0: & \always & \neg \hgranti \impl (\neg \hgranti \weakuntil \hbusreqi) & (G10.1)\\[3pt]
+& \always & (\hdecide \land (\forall \mathrm i: \neg \hbusreqi)) \impl \nextt \hgrant[0] & (G10.2) \\[3pt]
+& & \hgrant[0] \land (\forall \mathrm i \neq 0: \neg \hgranti) \land \hmaster = 0 \land \neg \hmastlock \\
+& & \land \hdecide \land \hstart & (G11)
+\end{array}}\]

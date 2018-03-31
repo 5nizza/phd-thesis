@@ -1,0 +1,12 @@
+%!TEX root = table.tex
+\begin{tikzpicture}[node distance=2cm,inner sep=1pt,minimum size=0.5mm,->,>=latex]
+
+\node[state,initial left] (a_1) {$1_A$};
+\node (dots) [right of=a_1] {$\ldots$};
+\node[state] (a_all) [right of=dots] {${all}_A$};
+
+\path (a_1) edge [above] node {$\disj{1_B}$} (dots);
+\path (dots) edge [above] node {$\disj{k_B}$} (a_all);
+\path (a_all) [loop above] edge node {} (a_1);
+
+\end{tikzpicture}

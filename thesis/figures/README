@@ -1,0 +1,14 @@
+I use tikzit to draw diagrams.
+It produces `tikz` files,
+but you need the custom preamble to be able to import the tikz into that program.
+The preamble is now located in file macros.tex,
+see also the comments there.
+
+My workflow is:
+- edit and save the figure in tikzit (the file is included in the main.tex)
+- if I updated the preamble `ctl-via-ltl`, then update macros.tex
+
+As for odg files:
+- edit them with libre
+- export to PDF
+- crop using pdfcrop

@@ -1,0 +1,25 @@
+\[ 
+{\footnotesize
+\begin{array}{rllr}
+
+
+\multicolumn{4}{l}{\text{Assumptions $\Phi'(i)$:}}\\[2pt]
+%\text{Assumptions $\Phi(i)$:} 
+& \textit{~~~~as before: } & A1, A2, A3, A4 \\[3pt]
+
+& \textit{~~~~new: } & \always~~ \hbusreqi \impl \neg \norequestsi & (A6)\\ [5pt]
+
+\multicolumn{4}{l}{\text{Guarantees $\Psi'(0)$:}}\\[2pt]
+& \textit{~~~~as before: } &  G1, G2, G3, G4, G5, G6, G7, G8, G9, G12 ~~ (\text{where $i=0$}) &  \\[3pt]
+
+& \textit{~~~~removed: } & G10.1, G11.1\\[3pt]
+
+& \textit{~~~~modified:} & \always (\norequests[0] \land \neg \tok[0] \land \nextt \tok[0])
+  \impl
+  \X \hgrant[0])& (G10.2) \\[3pt]
+
+& \textit{~~~~modified:}& \tok[0]\impl\hgrant[0]\land\hmaster[0]\land\neg \hmastlock[0]  & (G11.2)
+
+\end{array}
+}
+\]

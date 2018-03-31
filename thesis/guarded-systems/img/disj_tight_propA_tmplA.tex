@@ -1,0 +1,15 @@
+%!TEX root = table.tex
+\begin{tikzpicture}[node distance=2cm,inner sep=1pt,minimum size=0.5mm,->,>=latex]
+
+
+\node[state,double] (a_1) {$a_1$};
+\node (dots) [right of=a_1] {$\ldots$};
+\node[state] (a_n) [right of=dots] {$a_{all}$};
+
+
+\path (a_1) edge [above] node {$\disj{b_1}$} (dots);
+\path (dots) edge [above] node {$\disj{b_{|T_B|}}$} (a_n);
+
+
+
+\end{tikzpicture}

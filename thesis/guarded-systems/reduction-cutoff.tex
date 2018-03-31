@@ -1,0 +1,153 @@
+\section{Reduction Method and Challenges} \label{gua:sec:paramsynt}
+ 
+We show how to use existing cutoff results of Emerson and Kahlon~\cite{Emerson00} to reduce the PMCP to a standard model checking problem,
+and parameterized template synthesis to template synthesis.
+We note the limitations of the existing results that are crucial in the context of synthesis.
+
+\subsection*{Reduction by Cutoffs} \label{page:gua:def:cutoff}
+
+\parbf{Cutoffs}
+A \emph{cutoff} for a system type $(\templateI,\templateII)$ and a specification $\spec$ is a number $c \in \bbN$ such that:
+\[ 
+\forall n \ge c: \left( \cutoffsys \models \spec ~~\Iff~~ \largesys \models \spec \right).
+\]
+Similarly,
+a \emph{cutoff for deadlock detection} for a system type $(\templateI,\templateII)$ is a number $c \in \bbN$ such that:
+\[ 
+\forall n \ge c: \left( \cutoffsys \textit{ has a deadlock} ~~\Iff~~ \largesys \textit{ has a deadlock}\right).
+\]
+Here, ``has a deadlock'' means ``there is a locally or globally deadlocked run''.
+
+For the systems and specifications presented in this work, cutoffs can be computed from 
+the size of the process template $B$ and the number $k$ of copies of $B$ 
+mentioned in the specification, and are given as expressions like 
+$\card{B}+k+1$.
+
+\begin{remark}\label{re:EK_cutoffs}
+Our definition of a cutoff is different from that of Emerson and Kahlon~\cite{Emerson00}, and instead similar to, e.g., Emerson and Namjoshi~\cite{Emerso03}. The reason is that we want the following property to hold for any $(A,B)$ and $\Phi$: 
+\begin{quote}
+if $n_0$ is the smallest number such that ~$\forall n \geq n_0:\ \largesys \models \Phi$,
+then any $c<n_0$ is not a cutoff, any $c\geq n_0$ is a cutoff.
+\end{quote}
+We call $n_0$ the \emph{tight} cutoff.
+The definition of Emerson and Kahlon~\cite[page 2]{Emerson00} requires that
+$\forall{n\leq c}. \largesys \models \Phi$
+if and only if
+$\forall{n \geq 1}: \largesys \models \Phi$, and thus allows stating $c<n_0$ as a cutoff if $\Phi$ does not hold for all $n$.
+\end{remark}
+
+\parbf{Parameterized synthesis}
+We encourage the reader to revisit Chapter~\ref{defs:bounded_synthesis} on page~\pageref{page:defs:bounded_synthesis}
+to recall how bounded synthesis works in the case of non-distributed systems.
+Now we adapt the procedure to guarded parameterized systems.
+In parameterized model checking
+a cutoff allows us to check whether any ``big'' system satisfies the specification
+by checking it in the cutoff system.
+A similar reduction applies to the parameterized synthesis problem~\cite{JB14}.
+For guarded protocols, we obtain the following 
+\emph{semi-decision procedure for parameterized synthesis}\ak{is it decidable?}:
+\begin{enumerate}
+  \item[0.] set initial bound $(\bound_A,\bound_B)$ on the size of the process templates;
+  \item[1.] determine the cutoff for $(\bound_A,\bound_B)$ and $\spec$;
+  \item[2.] solve the bounded template synthesis problem for cutoff, size bound, and $\spec$;
+  \item[3.] if successful, return $(A,B)$, else increase $(\bound_A,\bound_B)$ and goto (1).
+\end{enumerate}
+This procedure was implemented inside our parameterized synthesis tool PARTY~\cite{party}
+by Simon Au{\ss}erlechner as a part of his Master Thesis~\cite{SimonThesis}.
+
+\subsection*{Existing Cutoff Results}
+Emerson and Kahlon~\cite{Emerson00} have shown:
+
+\begin{theorem}[Disjunctive Cutoff Theorem] \label{thm:disj-cutoff-pairs}
+    For closed disjunctive systems $A{\parallel}B^n$,
+    $\card{B}+2$ is a cutoff {$^{(\dagger)}$} for formulas of the
+    form $\A h(A,B^{(1)})$ and $\E h(A,B^{(1)})$, and for global
+    deadlock detection.
+\end{theorem}
+ 
+\begin{theorem}[Conjunctive Cutoff Theorem] \label{thm:conj-cutoff}
+    For closed conjunctive systems ${A{\parallel}B^n}$,
+    $2\card{B}$ is a cutoff {$^{(\dagger)}$} for formulas of the
+    form $\A h(A)$ and $\E h(A)$, and for global deadlock detection.
+    For formulas of the form $\A h(B^{(1)})$ and $\E h(B^{(1)})$,
+    $2\card{B}+1$ is a cutoff.
+\end{theorem}
+\noindent
+In the above theorems,
+$h(A)$ (resp.\ $h(B^{(1)})$) means that the formula talks about the $A$-process only (resp.\ $B_1$).
+
+\begin{remark} ${(\dagger)}$
+Note that Emerson and Kahlon \cite{Emerson00} proved these results for
+a different definition of a cutoff (see Remark \ref{re:EK_cutoffs}).  
+Their results also hold for our definition, except possibly for
+global deadlocks.  For the latter case to hold with the new cutoff definition, one 
+also needs to prove the direction ``global deadlock in the cutoff system implies global
+deadlock in a large system'' (later called Monotonicity Lemma).
+In Sections~\ref{gua:sec:proofs-disj-deadlock-unfair} and \ref{gua:sec:proofs-disj-deadlock-fair},
+Sections~\ref{gua:sec:proofs-conj-deadlock-unfair} and \ref{gua:sec:proofs-conj-deadlock-fair},
+we prove these lemmas for the case of general deadlock (global \emph{or} local).
+\end{remark}
+
+\subsection*{Challenge: Open Systems}
+For any open system $S$ there exists a closed system $S'$ such that $
+S$ and $S'$ cannot be distinguished by $\LTL$ specifications 
+(e.g., see Manna and Pnueli~\cite{Manna92}). Thus, one approach to PMC for open 
+systems is to use a translation between open and closed systems, and then use the 
+existing cutoff results for closed systems.
+
+%While such an approach works in theory, it is not feasible when cutoffs 
+%depend on the size of process templates: in this case the conversion not only results in a 
+%blowup of the local state space of each process, but also in the number of 
+%processes that we need to consider. 
+While such an approach works in theory, it might not be feasible in practice:
+since cutoffs depend on the size of the process templates,
+and the translation blows up the process template,
+it also blows up the cutoffs.
+Thus, cutoffs that directly support open systems are important.
+
+
+\subsection*{Challenge: Liveness and Deadlocks under Fairness}
+We are interested in cutoff results that support liveness properties.
+Consider a specification $\Phi=h(A,B^{(k)})$.
+In general, we would like to consider only runs where all processes move infinitely often,
+i.e.,
+use the unconditional fairness assumption $\forall{p}. \GF \sched_p$ and thus have $\A_{uncond}\Phi$.
+However, this would mean that we accept all systems that always go into a local deadlock,
+since then the assumption is violated (i.e., there will be no unconditionally-fair runs).
+This is especially undesirable in synthesis, because the synthesizer often tries to violate the assumptions to satisfy the specification.
+To avoid this,
+we require the absence of local deadlocks.
+But local deadlocks may appear due to unfair scheduling.
+Therefore we require the absence of local deadlocks under the strong fairness assumption,
+i.e., we require satisfaction of the formula
+$\A_{strong} \spec_{\neg dead}=\big(\forall{p}. (\GF \enabled_p \impl \GF \sched_p)\big) \impl \forall{p}. \GF\enabled_p$.
+This formula can be roughly read as ``the absence of local deadlocks under fair scheduling''.
+Since absence of global deadlocks and absence of local deadlocks under strong fairness imply unconditional fairness,
+we can safely use $\A_{uncond}\Phi$.
+
+%In these systems, processes may be disabled depending on their input and the global state. \change{Thus, strong fairness $\forall{p}. (\GF \enabled_p \impl \GF \sched_p)$ is an insufficient assumption, since the environment can easily violate liveness properties by choosing inputs and scheduling such that some process is only enabled finitely often.}
+%{Thus, strong fairness $\forall{p}. (\GF \enabled_p \impl \GF \sched_p)$ is an
+%insufficient assumption, since the environment can easily violate a process's liveness
+%property by choosing inputs and scheduling such that the process never moves 
+%after some moment.}
+%%
+%Moreover, using the unconditional fairness assumption $\forall{p}. \GF \sched_p$
+%\remove{for the complete specification} is also undesirable, since then we would accept all systems that always go into a local deadlock. This is especially undesirable in synthesis.
+%To exclude this case, we require absence of local deadlocks under the strong fairness assumption. 
+
+In summary, for a parameterized specification $\spec$, we consider satisfaction of
+\[
+\begin{array}{lllll}
+\textit{``all runs are infinite''} &~~\land~~& \A_{strong} \spec_{\neg dead} & ~~\land~~ & \A_{uncond} \spec.
+\end{array}
+\]
+%
+This is equivalent to $\textit{``all runs are infinite''} \land \A_{strong} (\spec_{\neg dead} \,\land\, \spec)$, but by considering the form above we can separate the tasks of deadlock detection and of model checking $\LTLmX$-properties, and obtain modular cutoffs. 
+(The phrase ``all runs are infinite'' is another way of saying ``all runs have no global deadlocks''.)
+
+%%%In the following, we present cutoffs for problems of the forms 
+%%%(i) $\A_{uncond} \spec$ and
+%%%(ii) $\E_{strong} \spec_{dead} \lor \textit{``some run is finite''}$
+%%%(and the variants of (i) with $\E$ path quantifier).
+%%%%, as well as for the detection of global deadlocks.
+%%%% AK: the previous version reads like we provide cutoffs for three problems -- we have only two

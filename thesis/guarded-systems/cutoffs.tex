@@ -1,0 +1,66 @@
+\section{New Cutoff Results} \label{gua:sec:cutoffs}
+
+We present new cutoff results that extend Theorems~\ref{thm:disj-cutoff-pairs} and \ref{thm:conj-cutoff}.
+The new and previous results are summarized in the table below.
+
+\begin{table}[h]
+\centering
+%\vspace{-10pt}
+\label{table:cutoffs}
+\centering
+\setlength{\tabcolsep}{2pt}
+{%\resizebox{\linewidth}{!}{
+\begin{tabular}{ r|c|c|c|c }
+   & \specialcellC{$h(A,B^{(k)})$ \\ no fairness} & \specialcellC{deadlock detection \\ no fairness} & \specialcellC{$h(A,B^{(k)})$ \\ uncond. fairness} & \specialcellC{deadlock detection \\ strong fairness}  \\[9pt]
+\hline
+Disjunctive~ & $|B| + k + 1$ &
+        $2|B| - 1$ & 
+        $2|B| + k - 1$ &
+        $2|B| - 1$ 
+          \\[4pt]
+\hline
+Conjunctive~ & 
+        $k+1$ &  
+        $2|B|-2~(*)$ & 
+        $k+1~(*)$ &  
+        $2|B|-2~(*)$
+\end{tabular}
+}
+%\vspace{-10pt}
+\end{table}
+The table distinguishes between disjunctive and conjunctive systems (in rows).
+In the columns,
+we consider satisfaction of properties $h(A,B^{(k)})$ and the existence of deadlocks,
+with and without fairness assumptions.
+All results hold for open systems, and for both path quantifiers $\pforall$ and $\pexists$.
+Cutoffs depend on the size of process template $B$ and the number $k \geq 1$ of $B$-processes a property talks about.
+
+Results marked with a $(*)$ are for a restricted class of systems:
+for conjunctive systems with fairness, we require infinite runs to be 
+initializing, i.e., all non-deadlocked 
+%$B$-processes 
+processes
+return to 
+$\init$
+%$\initstate_B$ 
+infinitely often.\footnote{This assumption is in the same 
+flavor as the restriction that $\initstate_A$ and $\initstate_B$ appear in 
+all conjunctive guards. Intuitively, the additional restriction makes sense 
+since conjunctive systems model shared resources, and everybody who takes a 
+resource should eventually release it.}
+Additionally, the cutoffs for deadlock detection in conjunctive systems only support $1$-conjunctive systems.
+\ak{explain why we need it}
+%The reason for this restriction will be explained in Remark~\ref{rem:general-conj-tough} and Appendix~\ref{gua:sec:app-conj}.
+
+All cutoffs in the table are tight---no smaller cutoff can exist for 
+this class of systems and properties---except for the case of deadlock 
+detection in disjunctive systems without fairness. There, the cutoff is 
+asymptotically tight, i.e., it must increase linearly with the size 
+of the process template.
+
+Note that the table does not describe all possible combinations:
+for example, we do not consider satisfaction of $h(A,B^{(k)})$ on strong-fair runs.
+But the results in the table are the most interesting, from our view,
+for parameterized synthesis.
+
+In the following sections we prove the results.

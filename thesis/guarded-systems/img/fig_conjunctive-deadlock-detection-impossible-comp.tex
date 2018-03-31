@@ -1,0 +1,40 @@
+\begin{tikzPath}	
+     	\node (T21-0) [pstate,label=right:$a_1$] {}; 
+     	\node (T21-1) [below of=T21-0,hiddenstate,label=right:$$] {};   		
+     	\node (T21-2) [below of=T21-1,hiddenstate,label=right:$$] {};
+     	\node (T21-3) [below of=T21-2,pstate,label=right:$a_1$] {};   		
+	\node (T21-4) [below of=T21-3,pstate,label=right:$a_1$] {};
+	    
+	\draw[trans-notsched,dashed] (T21-0) -- (T21-3); 
+	\draw[trans-notsched] (T21-3) -- (T21-4);
+	
+     	\node (T22-0) [pstate,right of=T21-0,label=right:$b_1$,node distance=1cm] {}; 
+     	\node (T22-1) [below of=T22-0,hiddenstate,label=right:$$] {};   		
+     	\node (T22-2) [below of=T22-1,hiddenstate,label=right:$$] {};
+     	\node (T22-3) [below of=T22-2,pstate,label=right:$b_1$] {};   		
+     	\node (T22-4) [below of=T22-3,pstate,label=right:$b_1$] {};
+
+	\draw[trans-notsched,dashed] (T22-0) -- (T22-3);
+	\draw[trans-notsched] (T22-3) -- (T22-4);
+
+\newcommand{\patht}[3]{
+     	\node (T22-0) [pstate,right of=T22-0,label=right:$b_1$,node distance=#1] {}; 
+     	\node (T22-1) [below of=T22-0,hiddenstate,label=right:$$] {};   		
+     	\node (T22-2) [below of=T22-1,hiddenstate,label=right:$$] {};
+     	\node (T22-3) [below of=T22-2,pstate,label=right:$#2$] {};
+	\node (T22-4) [below of=T22-3,pstate,label=right:$#3$] {};
+
+	\draw[trans-notsched] (T22-0) -- (T22-3);
+	\draw[trans-notsched] (T22-3) -- (T22-4);
+}
+
+    \patht{1cm}{a_1}{a_1}
+    \patht{1cm}{b_2}{b_2}
+    \patht{1cm}{b_2}{b_2}
+    \node (T22-0) [hiddenstate,right of=T22-0,label=right:$\dots\dots$,node distance=1cm] {}; 
+    \patht{2cm}{b_d}{b_d}
+    \patht{1cm}{b_d}{b_d}
+    \node (T22-0) [hiddenstate,right of=T22-0,label=right:$\dots\dots$,node distance=1cm] {}; 
+    \patht{2cm}{b_{|T_B|}}{b_{|T_B|}}
+    \patht{1cm}{b_d}{b_{|T_B|}}
+    \end{tikzPath}

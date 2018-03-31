@@ -1,0 +1,13 @@
+\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=2cm,
+                    semithick]
+  \tikzstyle{every state}=[align=center, anchor=center]
+  \tikzstyle{every edge} = [align=center,draw=black,]
+
+  \node[state] (A) [label={below:$\neg g$}] {$a^0$};
+  \node[state] (B) [below of=A, label={below:$\neg g$},] {$a^1$};
+
+  \path 
+  (A) edge [loop above] node {$\neg r : \forall \{a^0\}$} (A)
+  (A) edge [left, bend right] node {$r: \forall \{a^0\}$} (B)
+  (B) edge [right, bend right] node {$*: \forall \{a^0\}$} (A);
+\end{tikzpicture}

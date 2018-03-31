@@ -1,0 +1,30 @@
+% !TEX root = table.tex
+\begin{tikzpicture}[node distance=2.4cm,inner sep=1pt,minimum size=0.5mm,->,>=latex]
+
+
+\node[initial above, state] (init) {$init$};
+\node[state] (b_1) [left=2.7cm of init] {$1_B$};
+\node (dots) [below=1cm of init] {$\ldots$};
+\node[state] (b_k) [right=2.7cm of init] {$k_B$}; 
+
+% \path (b_1.20) edge [above] node {\specialcell{$\forall{\neg b_1}$\\...\\$\forall{\neg b_k}$}} (init.160);
+\path (b_1.20) edge [above] node {$\forall{\neg 1_B},...,\forall{\neg k_B}$} (init.160);
+\path (init.200) edge [above] node {} (b_1.340);
+
+\path (b_k.160) edge [above] node {$\forall{\neg 1_B},...,\forall{\neg k_B}$} (init.20); 
+\path (init.340) edge [above] node {} (b_k.200); 
+
+\path (init.282) edge [left, dotted] node {} ($(dots)+(0.1,0.1)$);
+\path ($(dots)-(0.1,-0.1)$) edge [left, dotted] node {$\forall{\neg 1_B},...,\forall{\neg k_B}$} (init.257);
+
+% \path (b_1) [loop left] edge [left] node {$\forall\neg b_1$} (b_1);
+% \path (b_1) [loop left,dotted,distance=26mm] edge [left] node {...} (b_1);
+% \path (b_1) [loop left,distance=38mm] edge [left] node {$\forall\neg b_k$} (b_1);
+
+% \path (b_k) [loop right] edge [right] node {$\forall\neg b_1$} (b_k);
+% \path (b_k) [loop right,dotted,distance=26mm] edge [right] node {...} (b_k);
+% \path (b_k) [loop right,distance=38mm] edge [right] node {$\forall\neg b_k$} (b_k);
+
+
+\end{tikzpicture}
+  

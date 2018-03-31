@@ -1,0 +1,53 @@
+\section{Conclusion} \label{gua:sec:concl}
+
+We have extended the cutoffs for guarded protocols of Emerson and 
+Kahlon~\cite{Emerson00} to support local deadlock detection, fairness 
+assumptions, and open systems.
+In particular, our results imply the decidability of the parameterized model checking problem for this class of systems and specifications,
+which to the best of our knowledge was unknown before. 
+%Our results allow us to model check
+%guarded protocols that satisfy not 
+%only safety, but also liveness conditions, for an arbitrary number of 
+%components. 
+Furthermore, the cutoff results can easily be integrated into 
+the parameterized synthesis approach~\cite{JB14}.
+%~\cite{Jacobs14,Khalimov13,Khalimov13a}.
+
+%An approach for using cutoff results in 
+%synthesis has been introduced by 
+%Jacobs and Bloem~\cite{Jacobs14}. It has been described in detail for the 
+%case of 
+%token-passing systems. Follow-up papers have shown how to make the approach 
+%more efficient~\cite{KhalimovJB13b}, and how to use it for the synthesis of a 
+%large 
+%case study, the AMBA bus arbiter~\cite{BloemJK14}.
+
+Since conjunctive guards can model atomic sections and read-write locks, 
+and disjunctive guards can model pairwise rendezvous 
+(for some classes of specifications, see~\cite{EmersonK03}), 
+our results apply to a wide spectrum of systems models.
+But the expressive power of the model %and flexibility of the results 
+comes at a high cost: cutoffs are linear in the size of a process, and 
+are shown to be tight (with respect to this parameter).
+For conjunctive systems, our new results are restricted to systems with
+1-conjunctive guards, effectively only allowing to model a single shared
+resource. 
+We conjecture that our proof methods can be extended to systems with
+more general conjunctive guards, at the price of bigger cutoffs.
+We leave this extension and the question of finding cutoffs that are independent of the size of processes for future research.
+
+We did preliminary experiments~\cite{SimonThesis} by implementing the synthesizer inside our parameterized synthesizer PARTY~\cite{party}.
+It is a possible future work to find and apply it to real-world applications.
+%
+%
+%We are working on a prototype implementation (\url{https://bitbucket.org/parsy/guarded_synthesis/}), which however is currently limited to very small systems.\sj{we should re-formulate or remove the comment on implementation} 
+%In future work, we will try to lift the restrictions of our results for conjunctive systems, and investigate cutoffs that are independent of the size of the components' state spaces.
+%\ak{remove this promise?}
+\ak{note that EK have better complexities for 'for all paths' properties. 
+As a future work, one can look if our cutoffs can be improved.}
+%This is due 
+%to the growth of the cutoff (linearly) and the set of possible transition 
+%guards (doubly exponential) in the size of process templates. 
+%In the future, 
+%we will look into cutoffs that are independent of the size of process 
+%templates.

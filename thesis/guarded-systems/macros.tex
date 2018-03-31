@@ -1,0 +1,172 @@
+
+\newcommand{\mP}{\mathcal{P}}
+\newcommand{\mB}{\mathcal{B}}
+\newcommand{\mF}{\mathcal{F}}
+\newcommand{\mD}{\mathcal{D}}
+\newcommand{\mC}{\mathcal{C}}
+
+
+\newcommand{\pclass}{{\sf cl}}
+\newcommand{\val}{{\sf val}}
+\newcommand{\guard}{{\sf guard}}
+\newcommand{\eval}{{\sf eval}}
+\newcommand{\init}{{\sf init}\xspace}
+\newcommand{\templateI}{A}
+\newcommand{\templateII}{B}
+\newcommand{\formula}{F}
+\newcommand{\formulas}{\mathcal{\formula}}
+\newcommand{\inputs}{\Sigma}
+\newcommand{\localin}{\sigma}
+\newcommand{\globIn}{E}
+
+\newcommand{\visited}{\mathsf{Visited}}
+\newcommand{\visInf}[2]{\mathsf{Visited}^\inf_{#1}\!(#2)}
+\newcommand{\visFin}[2]{\mathsf{Visited}^\fin_{#1}\!(#2)}
+\newcommand{\witness}{\mathsf{witness}}
+\newcommand{\witfirst}{\mathsf{wit\_first}}
+\newcommand{\witsecond}{\mathsf{wit\_second}}
+\newcommand{\witlast}{\mathsf{wit\_last}}
+\newcommand{\first}{\mathsf{first}}
+\newcommand{\enter}{\mathsf{enter}}
+\newcommand{\exit}{\mathsf{exit}}
+
+\newcommand{\deadlock}{\mathsf{lock}}
+\newcommand{\cutoff}{\mathsf{cutoff}}
+\newcommand{\destutter}{\ensuremath{\mathsf{destutter}}\xspace}
+\newcommand{\bound}{b}
+
+\newcommand{\sched}{{{\sf move}}}
+\newcommand{\enabled}{{{\sf en}}}
+\newcommand{\moves}{{{\sf moves}}}
+
+\definecolor{darkgreen}{rgb}{0,0.5,0}
+\definecolor{darkblue}{rgb}{0,0,.5}
+\definecolor{mygray}{gray}{.3}
+
+%% macros for LTSs (states, state sets, etc.)
+%% to change whole batch, just change \state command
+\newcommand{\state}{q}
+\newcommand{\initstate}{{\sf init}\xspace}
+\newcommand{\stateset}{\expandafter\MakeUppercase\expandafter{\state}}
+\newcommand{\State}{s}
+\newcommand{\Stateset}{\expandafter\MakeUppercase\expandafter{\State}}
+\newcommand{\LTS}{\mathcal \stateset}
+%% transition function, state labels, ...
+%\newcommand{\trans}{\ensuremath{\delta}}
+%\newcommand{\Trans}{\ensuremath{\Delta}}
+\newcommand{\labeling}{L}
+\newcommand{\labelings}{\mathcal{\labeling}}
+%\newcommand{\inputs}{I}
+\newcommand{\outputs}{O}
+\renewcommand{\time}{m}
+\newcommand{\dead}{{\sf dead}\xspace}
+
+\newcommand{\myloop}[1]{\ensuremath{#1 \rightarrow \initstate \rightarrow #1}\xspace}
+
+%% set cardinality
+\newcommand{\card}[1]{\left| {#1} \right|}
+\newcommand{\Nat}{\ensuremath{\mathbb{N}}}
+%% 'such that'
+\newcommand{\smi}{\!\setminus\!}
+
+%% specification, implication
+\newcommand{\spec}{\Phi}
+\newcommand{\pspec}{\Phi}
+
+%\declaretheorem[name=Theorem]{thm}
+%\declaretheorem[name=Lemma]{lem}
+%\declaretheorem[name=Corollary]{cor}
+%\declaretheorem[name=Observation]{obs}
+%\declaretheorem[name=Tightness]{tightness}
+\newtheorem{tightness}{Tightness}
+
+\newcommand{\disj}[1]{\ensuremath{\exists\{#1\}}}
+\newcommand{\conj}[1]{\ensuremath{\forall\{#1\}}}
+
+% Disj proof
+\newcommand{\sys}[1]{(A,B)^{(1,#1)}}
+\newcommand{\cutoffsys}{\ensuremath{(A,B)^{(1,c)}}\xspace}
+\newcommand{\largesys}{\ensuremath{(A,B)^{(1,n)}}\xspace}
+\renewcommand{\interleave}{\ensuremath{\textit{interleave}}\xspace}
+%\newcommand{\first}{\textit{first}}
+\newcommand{\last}{\mathsf{last}}
+\renewcommand{\l}{\mathsf{l}}
+\newcommand{\f}{\mathsf{f}}
+\newcommand{\rpt}{\mathsf{rpt}}
+% \newcommand{\ppi}{\mathsf{pi}}
+\newcommand{\ppi}[1]{\mathsf{p}_{\circlearrowleft #1}}
+\newcommand{\ei}[1]{\mathsf{e}_{\circlearrowleft #1}}
+\newcommand{\qstar}{{\ensuremath{q^\star}}}
+\newcommand{\estar}{{\ensuremath{\mathsf{e}^\star}}}
+\newcommand{\fstar}{{\ensuremath{\mathsf{f}^\star}}}
+\newcommand{\fin}{\textit{fin}}
+\newcommand{\pref}{\mathsf{pref}}
+
+\renewcommand{\reach}{\mathsf{reach}}
+\newcommand{\tpref}{\textit{pref}}
+
+\renewcommand{\inf}{\textit{inf}}
+\newcommand{\lo}{\circlearrowleft}
+
+\newcommand{\others}{\textit{others}}
+\newcommand{\looop}{\textit{loop}}
+\newcommand{\xloop}{\mathsf{xloop}}
+\newcommand{\yloop}{\mathsf{yloop}}
+\newcommand{\yround}{\mathsf{round}}
+\newcommand{\inject}{\mathsf{inject}}
+
+\iffinal
+\newcommand{\gray}[1]{}
+\newcommand{\blue}[1]{{\color{blue!80} #1}}
+\else
+\newcommand{\gray}[1]{{\color{black!50} #1}}
+\newcommand{\blue}[1]{{\color{blue!80} #1}}
+\fi
+
+\newcommand{\transition}[3]{#1 \stackrel{#3}{\rightarrow} #2}
+\newcommand{\slice}[2]{\ensuremath{[{#1}\!:\!{#2}]}}
+\newcommand{\MinComp}[1]{\ensuremath{x(B^{\witfirst_{#1}})\slice{1}{\first_{#1}\!\!-\!\!1}}}
+\newcommand{\flood}{\textit{flood}}
+\newcommand{\yflood}{y^\flood}
+\newcommand{\sflood}{s^\flood}
+\newcommand{\eflood}{e^\flood}
+\newcommand{\Pflood}{P^\flood}
+\renewcommand{\fair}{\textit{fair}}
+\newcommand{\yfair}{y^\fair}
+\newcommand{\sfair}{s^\fair}
+\newcommand{\efair}{e^\fair}
+\newcommand{\Pfair}{P^\fair}
+\newcommand{\evac}{\textit{evac}}
+\newcommand{\yevac}{y^\evac}
+\newcommand{\sevac}{s^\evac}
+\newcommand{\eevac}{e^\evac}
+\newcommand{\Pevac}{P^\evac}
+\newcommand{\qloop}{q}
+\newcommand{\eloop}{e}
+
+\newcommand{\myparagraphraw}[1]{\smallskip\noindent{\bf#1}}
+\newcommand{\myparagraph}[1]{\myparagraphraw{#1.}}
+
+\NewEnviron{tikzLTS}{%
+  \begin{tikzpicture}[node distance=2cm,inner sep=1pt,minimum size=0.5mm,bend angle=20]
+	 	\tikzstyle{proc} = [rectangle,draw=black,fill=green!20,thick,inner sep=10pt]
+	  	\tikzstyle{state} = [circle,draw=black,thick,inner sep=3pt]
+	  	\tikzstyle{noproc} = [circle]
+	  	\tikzstyle{lbl} = [rectangle,node distance=2cm]
+  		\tikzstyle{pre} = [ <-,shorten <=2pt,shorten >=2pt, >=stealth', semithick]
+	  	\tikzstyle{post} = [ ->,shorten <=2pt,shorten >=2pt, >=stealth', semithick]
+    \BODY
+  \end{tikzpicture}
+}
+
+\NewEnviron{tikzPath}{%
+  \begin{tikzpicture}	
+  	\tikzstyle{pstate} = [circle, fill=black,thick, inner sep=2pt, minimum size=2mm]
+    \tikzstyle{hiddenstate} = [circle]
+  	\tikzstyle{trans-notsched} = [ ->,shorten <=2pt,shorten >=2pt, >=stealth', semithick]
+  	\tikzstyle{trans-sched} = [ ->,shorten <=2pt,shorten >=2pt, >=stealth', very thick] 
+    \BODY
+    \end{tikzpicture}
+}
+
+

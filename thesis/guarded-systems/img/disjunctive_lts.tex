@@ -1,0 +1,30 @@
+\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1.6cm,
+                    semithick]
+  \tikzstyle{every state}=[align=center,anchor=center]
+  \tikzstyle{every edge} = [align=center,draw=black]
+  \tikzstyle{boxLabel} = [yshift=-0.4cm]
+  \tikzstyle{box} = [draw=black, inner sep=0.75cm]
+	
+  \node[state] (t00) [label={left:$\neg w$}]                    {$0_A$};
+  \node[state] (t01) [below of=t00,label={left:$w$}] {$1_A$};
+  \coordinate (t00') at ($(t00.west) + (-1.0cm,0.5cm)$);
+  \coordinate (t01') at ($(t01.east) + (+0.75cm,-0.25cm)$);
+  \node (U1) [draw=black, fit=(t00') (t01'), inner sep=0.75cm] {} ;
+  \node [boxLabel] at (U1.north) {Template $A$};
+  
+  \path (t00) edge [bend right,left] node {$\exists \left\{0_B, 1_B\right\}$} (t01)
+            (t01) edge [bend right, right] node {$\exists \left\{1_B\right\}$} (t00);
+
+   
+   
+  \node[state] (t10) [label={left:$\neg g$},right of=t00,node distance=4.5cm] {$0_B$};
+  \node[state] (t11) [label={left:$g$}, below of=t10] {$1_B$};
+  \coordinate (t10') at ($(t10.west) + (-0.75cm,0.5cm)$);
+  \coordinate (t11') at ($(t11.east) + (+0.75cm,-0.25cm)$);
+  \node (U2) [box,fit=(t10') (t11')] {} ;
+  \node [boxLabel] at (U2.north) {Template $B$};
+  
+  \path (t10) edge [bend right,left] node {$\exists \left\{1_A\right\}$} (t11)
+            (t11) edge [bend right, right] node {$\exists \left\{1_A\right\}$} (t10);
+  %\draw[ltsBox,label={above:x},anchor=center] ($(t10.north west)+(-1.7,0.6)$)  rectangle ($(t11.south east)+(1.7,-0.6)$); 
+\end{tikzpicture}

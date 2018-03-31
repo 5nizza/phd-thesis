@@ -1,0 +1,14 @@
+\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=2cm,
+                    semithick]
+  \tikzstyle{every state}=[align=center, anchor=center, inner sep=2.2pt,minimum size=0.5mm]
+  \tikzstyle{every edge} = [align=center,draw=black,]
+  
+  \node[state] (N) [label={below:$$},] {$N$};
+  \node[state] (T) [right of=N, label={below:$$},] {$T$};
+  \node[state] (C) [right of=T, label={below:$$},] {$C$};
+
+  \path 
+  (N) edge  node {$true$} (T)
+  (T) edge node {$\forall \{T,N$\}} (C)
+  (C) edge [bend left=24] node {$true$} (N);
+\end{tikzpicture}

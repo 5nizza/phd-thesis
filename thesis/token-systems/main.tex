@@ -1,0 +1,1107 @@
+\chapter{Parameterized Token Rings} \label{chap:token-systems}
+
+\newcommand\VarNames{\textsf{Vars}}
+\newcommand{\pring}{\ensuremath{\mathcal {R}}}
+\renewcommand{\trans}[3]{#1 \stackrel{{#3}}{\rightarrow} #2}
+\newcommand{\trcv}{\mathsf{rcv}}
+\newcommand{\tsnd}{\mathsf{snd}}
+\newcommand{\sch}{\mathsf{sch}}
+\newcommand{\token}{\mathsf{tok}}
+\newcommand{\powerset}[1]{2^{#1}}
+\newcommand{\Locals}{Q}
+\newcommand{\LocalsI}{\Locals_0}
+\newcommand{\ActionsProc}{\Sigma_{\mathsf{pr}}}
+%\newcommand{\ActionsSys}{\Sigma_{\mathsf{sys}}}
+
+\newcommand{\IndSet}{\bbN}
+
+\newcommand{\Opr}{{\mathrm{O}_{\mathrm{pr}}}}
+\newcommand{\Osys}{{\mathrm{O}_{\mathrm{sys}}}}
+
+% \newcommand{\Ipr}{{\mathrm{I}_{\mathrm{int}}}}
+\newcommand{\IprAll}{{\mathrm{I}_{\mathrm{pr}}}}
+\newcommand{\Iloc}{\mathrm{I}_{loc}}
+\newcommand{\Iglob}{\mathrm{I}_{glob}}
+\newcommand{\Ipr}{\IprAll}
+\newcommand{\Isys}{{\mathrm{I}_{\mathrm{sys}}}}
+
+% AMBA signals
+\newcommand{\ambasignal}[1]{\textsc{#1}}
+\newcommand{\ambasignali}[2][i]{\textsc{#2}[\textrm{#1}]}
+\newcommand{\hgrant}{\ambasignal{\textcolor{blue}{hgrant}}}
+\newcommand{\hgranti}[1][i]{\ambasignali[#1]{\textcolor{blue}{hgrant}}}
+\newcommand{\hbusreq}{\ambasignal{\textcolor{red}{hbusreq}}}
+\newcommand{\hbusreqi}[1][i]{\ambasignali[#1]{\textcolor{red}{hbusreq}}}
+\newcommand{\hready}{\ambasignal{\textcolor{red}{hready}}}
+\newcommand{\hreadyi}[1][i]{\ambasignali[#1]{\textcolor{red}{ready}}}
+\newcommand{\hlock}{\ambasignal{\textcolor{red}{hlock}}}
+% \newcommand{\hlocki}[1][i]{\ambasignali[#1]{hlock}}
+\newcommand{\hlocki}{\ambasignali[i]{\textcolor{red}{hlock}}}
+\newcommand{\hmastlock}{\ambasignal{\textcolor{blue}{hmastlock}}}
+\newcommand{\hmastlocki}[1][i]{\ambasignali[#1]{\textcolor{blue}{hmastlock}}}
+\newcommand{\hburst}{\ambasignal{\textcolor{red}{hburst}}}
+\newcommand{\hbursti}{\ambasignali[i]{\textcolor{red}{hburst}}}
+% \newcommand{\hbursti}[1][i]{\ambasignali[#1]{hburst}}
+\newcommand{\hmaster}{\ambasignal{\textcolor{blue}{hmaster}}}
+\newcommand{\hmasteri}[1][i]{\ambasignali[#1]{\textcolor{blue}{hmaster}}}
+\newcommand{\hstart}{\ambasignal{\textcolor{blue}{start}}}
+\newcommand{\hstarti}[1][i]{\ambasignali[#1]{\textcolor{blue}{start}}}
+\newcommand{\hlocked}{\ambasignal{\textcolor{blue}{locked}}}
+\newcommand{\hlockedi}[1][i]{\ambasignali[#1]{\textcolor{blue}{locked}}}
+\newcommand{\hdecide}{\ambasignal{\textcolor{blue}{decide}}}
+% \newcommand{\hdecidei}[1][i]{\ambasignali[i]{decide}}
+\newcommand{\hdecidei}{\ambasignali[i]{\textcolor{blue}{decide}}}
+\newcommand{\tok}{\ambasignal{\textcolor{blue}{tok}}}
+% \newcommand{\toki}[1][i]{\ambasignali[#1]{tok}}
+\newcommand{\toki}{\ambasignali[i]{\textcolor{blue}{tok}}}
+\newcommand{\hincr}{\ambasignal{incr}}
+\newcommand{\hburstfour}{\ambasignal{burst4}}
+\newcommand{\hburstthree}{\ambasignal{burst3}}
+\newcommand{\norequestsi}{\ambasignali{\textcolor{red}{no\_req}}}
+\newcommand{\norequests}{\ambasignal{\textcolor{red}{no\_req}}}
+\newcommand{\send}{\ambasignal{send}}
+\newcommand{\sendi}{\ambasignali[i]{send}}
+
+\hfill {\footnotesize\textit{This chapter is based on joint work with R.Bloem and S.Jacobs~\cite{Khalimov13,party,BJK14}}~~~~~~~~}
+
+\begin{quotation}
+\noindent\textbf{Abstract.}
+Parameterized synthesis was recently proposed as a way
+to circumvent the poor scalability of current synthesis tools.
+The method uses cutoff results in token rings to
+reduce the problem to bounded distributed synthesis,
+and ultimately to a sequence of SMT problems. 
+But experiments show that the size of the specification is a major issue. 
+In this chapter we
+ (1) propose several optimizations of the approach, and
+ (2) perform a parameterized synthesis case study on the industrial arbiter protocol AMBA.
+
+In the first part of this chapter,
+we optimize the reduction of the parameterized to distributed synthesis.
+To this end,
+we refine the cutoff reduction using modularity and abstraction.
+The evaluation, using our specially developed parameterized synthesizer PARTY,
+shows that the optimizations lead to several orders of magnitude speed-ups.
+
+In the second part, we perform parameterized synthesis case study
+on the industrial arbiter protocol AMBA.
+The AMBA protocol has been used as a benchmark for many reactive synthesis tools,
+because it is hard to synthesize an implementation that can serve a large number of clients.
+We show how to use parameterized synthesis to obtain a component that serves a single master,
+and can be arranged in a ring of arbitrarily many components.
+We describe new tricks---a cutoff extension tailored for AMBA and decompositional synthesis---%
+that together with the previously described optimizations allowed us
+to synthesize a component with 14 states in about 1 hour.
+\end{quotation}
+
+\section{Introduction}
+
+By automatically generating correct implementations from a temporal logic 
+specification, reactive synthesis tools can relieve system designers from 
+tedious and error-prone tasks like low-level manual implementation and 
+debugging. This great benefit comes at the cost of high computational complexity 
+of synthesis, which makes synthesis of large systems an ambitious goal. 
+For instance, Bloem et al.~\cite{Bloem12}
+synthesize an arbiter for the ARM AMBA Advanced High
+Performance Bus (AHB)~\cite{AMBAspec}. The results, obtained using 
+RATSY~\cite{Bloem10c},
+show that both the size of the implementation and the time for synthesis
+increase steeply with the number of masters that the arbiter can
+handle. This is unexpected, since an arbiter for $n+1$ masters is very 
+similar to an arbiter for $n$ masters, and manual implementations grow only 
+slightly with the number of masters. While recent results show that 
+synthesis time and implementation size can be improved in standard LTL 
+synthesis tools~\cite{BS,GodhalCH13}, the fundamental problem of increasing 
+complexity with the number of masters can only be solved by adapting the 
+synthesis approach itself.
+
+To this end, Jacobs and Bloem~\cite{JB14} introduced the 
+\emph{parameterized synthesis} approach.
+A simple example of a parameterized specification is the following LTL specification of a simple arbiter:
+\[ \begin{array}{ll}
+  \forall i \neq j.~ & \G \neg ( g_i \land g_j ) \land \\
+  \forall i.~ & \G (r_i \impl \F g_i).
+  \end{array}
+\]
+In parameterized synthesis, we synthesize a building block that can be cloned to form a system that satisfies such a specification, for any number of components.
+
+Jacobs and Bloem~\cite{JB14} showed that parameterized synthesis is undecidable in general, but semi-decision procedures can be found for classes of systems with cutoffs, i.e., where parameterized verification can be reduced to verification of a system with a bounded number of components. They presented a semi-decision procedure for token-ring networks, building on results by Emerson and Namjoshi~\cite{Emerso03}, which show that for the verification of parameterized token rings, a cutoff of $5$ is sufficient for a certain class of specifications. Following these results, parameterized synthesis reduces to distributed synthesis in token rings of (up to) $5$ identical processes. To solve the resulting problem, a modification of the SMT encoding of the distributed bounded synthesis problem by Finkbeiner and Schewe~\cite{BS} was used.
+
+Experiments with the parameterized synthesis method~\cite{JB14} revealed that only very small specifications could be handled with this encoding. For example, the simple arbiter presented before can be synthesized in a few seconds for a ring of size $4$, which is the sufficient cutoff for this specification. However, synthesis does not terminate within $2$ hours for a specification that also excludes spurious grants, in a ring of the same size. Furthermore, the previously proposed method uses cutoff results of Emerson and Namjoshi~\cite{Emerso03} and therefore inherits a restricted language support and cannot handle specifications in assume-guarantee style~\cite{Bloem12}.
+This precludes the approach from being applied to the AMBA protocol.
+
+In this chapter we address both issues.
+
+In the first part of the chapter (Section~\ref{tok_rings:sec:bs-and-optimizations}),
+we optimize the reduction of the parameterized to distributed synthesis.
+We use the fact that
+(a) token-ring systems consist of isomorphic processes,
+(b) different properties may require different cutoffs, and
+(c) when model checking the behaviours of some fixed processes,
+    the behaviours of the others can be abstracted.
+The evaluation,
+using our specially developed parameterized synthesizer PARTY,
+show that the optimizations lead to several orders of magnitude speed-ups.
+ 
+In the second part of the chapter (Section~\ref{amba:sec}),
+we perform parameterized synthesis case study on the industrial arbiter protocol AMBA.
+The AMBA protocol has been used as a benchmark for many reactive synthesis tools,
+because it is hard to synthesize an implementation that can serve
+a large number of clients. We show how to use parameterized synthesis
+to obtain a component that serves a single master, and can be arranged
+in a ring of arbitrarily many components.
+We describe new tricks%
+---a cutoff extension tailored for AMBA and decompositional synthesis---%
+that together with the previously described optimizations allowed us
+to synthesize a component with 14 states in about 1 hour.
+
+The chapter starts with definitions in Section~\ref{tok_rings:defs},
+where we introduce token-ring systems, parameterized specifications and problems.
+Then we state known cutoff results and a slight generalization.
+Section~\ref{tok_rings:sec:bs-and-optimizations} describes
+the SMT encoding of the bounded synthesis for token-ring systems,
+followed by optimizations and experiments.
+Then we proceed to the AMBA case study (Section~\ref{amba:sec}).
+We describe the protocol and its parameterized specification.
+Section~\ref{amba:sec:handling-amba} contains the main contribution:
+(1) we rewrite the specification into the form feasible to parameterized synthesis and
+(2) we extend the known cutoffs to handle the resulting AMBA specification.
+In Section~\ref{amba:sec:experiments} on experiments,
+we describe the crucial optimization ``decompositional synthesis''
+and report synthesis timings.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Definitions} \label{tok_rings:defs}
+
+\subsection{Token-ring Systems} \label{tok_rings:defs:system}
+In this section we define token ring systems---%
+the LTS that consists of replicated copies of a process connected in a uni-directional ring.
+Transitions in a token ring system are either internal or synchronized
+(in which one process sends the token to the next process along the ring).
+The token starts in a non-deterministically chosen process.
+
+We start by recalling a (non-deterministic) labeled transition system.
+A \emph{labeled transition system (LTS)}
+is a tuple
+$(I,O,Q,Q_0,\delta,out)$
+where
+ $I$ is the set of {\em inputs},
+ $O$ is the set of {\em outputs} disjoint from $I$,
+ $Q$ is the set of {\em states},
+ $Q_0 \subseteq Q$ is the set of {\em initial states},
+ $\delta \subseteq Q \times 2^I \times Q$ is the {\em transition relation},
+ and $out:Q \to 2^O$ is the \emph{output function} (also called {\em state-labeling} function).
+
+Fix two disjoint sets:
+a set $\Opr$ of process template \emph{output variables} that contains two distinguished output variable,
+$\tsnd$ and $\token$,
+and a set $\Ipr$ of process template \emph{input variables} that contains a distinguished input variable $\trcv$.
+We always assume that $\Ipr$ and $\Opr$ are disjoint.
+
+
+\parbf{Process template} \label{page:tok_rings:defs:process_template}
+A {\em process template} $P$ is an LTS
+$(\Ipr, \Opr, Q, Q_0, \delta, out, A_{loc})$:
+\begin{enumerate}[label*=\roman*)]
+\item 
+The state set $Q$ is finite and can be partitioned into two non-empty disjoint sets: $Q = T \cupdot NT$. 
+    States in $T$ are said to {\em have the token}.
+
+\item
+The initial state set is $Q_0  = \{\iota_t, \iota_n\}$ for some $\iota_t \in T, \iota_n \in NT$.
+
+\item
+The output function is $out: Q \rightarrow 2^{\Opr}$ and it satisfies:
+\li
+\- for every $t \in NT$: $\token \not\in out(t)$ and for every $t \in T$: $\token \in out(t)$,
+\- for every $t \in Q$: $\tsnd \in out(t) \impl t \in T$.
+\il
+
+\item
+Let $\ActionsProc = 2^\Ipr$.
+Let $\ActionsProc^\trcv = \{ i \in \ActionsProc \| \trcv \in i \}$, 
+$\ActionsProc^{\neg \trcv} = \ActionsProc \setminus \Sigma^\trcv$,
+$T^\tsnd = \{ q \in \Locals \| \tsnd \in out(q) \}$,
+$T^{\neg \tsnd} = T \setminus T^\tsnd$.
+Then the transition function: 
+\begin{equation}\label{tok_rings:eq:process-trans}
+\delta \subseteq 
+T^\tsnd \times \ActionsProc^{\neg \trcv}\times NT  ~~\cup~~
+NT\times\ActionsProc^\trcv\times T   ~~\cup~~
+NT\times\ActionsProc^{\neg \trcv}\times NT   ~~\cup~~
+T^{\neg \tsnd}\times\ActionsProc^{\neg \trcv}\times T.
+\end{equation}
+
+Also, $\delta$ is non-terminating: 
+for every $q \in NT$ and every $i \in \ActionsProc$
+  there exists $\trans{q}{q'}{i}$; 
+and for every $q \in T$ and every $i \in \ActionsProc^{\neg \trcv}$
+  there exists $\trans{q}{q'}{i}$.
+
+\item [$\dagger$)]
+$A_{loc}$ is a \emph{fairness} condition over $\Ipr \cup \Opr$.
+We require that on every infinite path from an initial state and satisfying $A_{loc}$,
+from any state with the token, $q \in T$, the process reaches a state $q'$ where it sends the token.
+(In LTL this can be written as $A_{loc} \impl \G(\token \impl \F \tsnd)$.)
+We call this requirement ($\dagger$).
+We omit $A_{loc}$ in the LTS tuple when it is not important.
+\end{enumerate}
+
+
+
+\parbf{Ring topology $R$}
+A {\em ring} is a directed graph $R = (V,E)$,
+where the set of vertices is $V = \{ 1,\ldots,k\}$ for some $k \in \IndSet$,
+and the set of edges is $E = \{(i,i_{mod |V|}+1) \mid i\in V\}$.
+We will skip ``$mod |V|$'' and write $i+1$.
+Vertices are called {\em process indices}.
+
+
+\parbf{Token-ring system $P^R$}
+Fix a ring topology $R=(V,E)$.
+
+Let $\Isys = (\Iloc \times V) \cupdot \Iglob$
+be the \emph{system input variables},
+where local inputs $\Iloc$ and global inputs $\Iglob$ are
+such that $\Ipr = \Iloc \cupdot \Iglob$.
+%Define $\ActionsSys = \powerset{\Isys}$.
+For system input ${\sf in} \in 2^\Isys$,
+let ${\sf in}(v) = \{ i \in {\sf in} \| i\in \Iloc\times\{v\} \cup \Iglob \}$
+denote the input to process $v$ (including global inputs).
+
+Let $\Osys = \Opr \times V$ be the \emph{system output variables}. 
+For $(p,i)$ in $\Osys$ or in $\Isys\setminus \Iglob$ we write $p_i$. 
+
+Given a process template $P =  (\Ipr, \Opr, Q, Q_0, \delta, out)$
+and a token ring topology $R = (V,E)$,
+the {\em token-ring system} $P^R$ is the LTS $(\Isys,\Osys,S,S_0,\Delta,Out)$:
+
+\li
+\- The set $S$ of \emph{global states} is $Q^V$,
+   i.e., all functions from $V$ to $Q$.
+   If $s \in Q^V$ is a global state
+   then $s(i)$ denotes the local state of the process with index $i$.
+
+\- The set of \emph{global initial states} $S_0$ contains all $s_0 \in Q_0^V$
+   in which exactly one of the processes has the token.
+
+\- The labeling $Out(s): S \to 2^\Osys$ is:
+   for every $s \in S$: $p_i \in Out(s)$ iff $p \in out(s(i))$, for $p \in \Opr$ and $i \in V$.
+\il
+
+Finally, we define the {\em global transition relation} $\Delta$. 
+In a {\em fully asynchronous token ring},
+a subset of the processes can make a transition in each step of the system.
+Thus, $\Delta$ consists of the following set of transitions:
+
+ \begin{itemize}
+  \item 
+  An {\em internal transition} is an element $(s,{\sf in},s')$ of $S \times 2^\Isys \times S$, for which there are process indices $M \subseteq V$ such that 
+  \begin{enumerate}[label*=\roman*)]
+    \item
+    for all $v \in M$: $\tsnd \not\in out(s(v))$ and $\trcv \not \in{\sf in}(v)$,
+
+    \item 
+    for all $v\in M$: $\trans{s(v)}{s'(v)}{in(v)}$ is a transition of $P$, and
+
+    \item 
+    for all $u \in V \setminus M$: $s(u) = s'(u)$.
+  \end{enumerate}
+
+  \item
+  A {\em token-passing transition}  is an element $(s,{\sf in},s')$ of $S \times 2^\Isys \times S$
+  for which there are two process indices $v$ and $w=v+1$ and process indices $M \subset V$
+  with $\{v,w\} \subseteq M$ such that
+
+  \begin{enumerate}[label*=\roman*)]
+    \item
+    $\tsnd \in out(s(v))$, 
+    and $\forall{u \in M\setminus \{v\}} : \tsnd \not\in out(s(u))$%
+    ---i.e., only process $v$ sends the token,
+
+    \item
+    $\trcv \in {\sf in}(w)$ and
+    for all $u \in M \setminus \{w\}$: $\trcv \not \in{\sf in}(u)$%
+    ---i.e., only process $w$ receives the token,
+
+    \item
+    for every $u\in M$: $\trans{s(u)}{s'(u)}{in(u)}$ is a transition of $P$, and
+
+    \item
+    for every $u \in V \setminus M$: $s'(u) = s(u)$.
+  \end{enumerate}
+
+ \end{itemize}
+%
+
+Special cases of the fully asynchronous token ring are the \emph{synchronous token ring}
+and the \emph{interleaving token ring}.
+In a synchronous token ring, $M=V$ for internal and token-passing transitions,
+i.e., at each step all the processes simultaneously make a transition.
+In an interleaving token ring,
+$M = \{v\}$ for some $v\in V$ for internal transitions,
+and $M=\{v,w\}$ for $(v,w)\in E$ for token-passing transitions,
+i.e., at each moment either \emph{exactly one} process makes an internal transition,
+or one process sends a token to the next process.
+
+An example of processes arranged in a token ring is in Figure~\ref{fig:ring-architecture}.
+
+\begin{figure}[tb]\center
+\input{token-systems/figures/ring-example}
+\caption{Token ring system with 4 processes.
+  Every process has input $r$ and output $g$.
+  Additionally, every process has input $\trcv$ and output $\tsnd$ that are used for passing the token.
+  Thus, $\Ipr=\{r,\trcv\}$ and $\Opr = \{g,\tsnd\}$.
+  In this example, $\Iglob$ is empty.}
+\label{fig:ring-architecture}
+\end{figure}
+
+
+\parbf{System runs}
+Fix a ring topology $R = (V,E)$ and a process template $P$.
+A \emph{run of a token ring system}
+$P^{R}=(\Isys,\Osys,S,S_0,\Delta,Out)$ is a maximal-finite or infinite sequence
+$x=(s_1,{\sf in}_1,M_1)(s_2,{\sf in}_2,M_2)\ldots$,
+where:
+\li
+\- $s_1 \in S_0$, $s_k \in S$ and ${\sf in}_k \in 2^\Isys$ for any $k \le |x|$,
+\- for all $k < |x|: (s_k,{\sf in}_k,s_{k+1}) \in \Delta$,
+\- for all $k < |x|$: $M_k$ is the set of processes transiting in $(s_k,{\sf in}_k,s_{k+1})$
+   (see $M$ in the definition of $\Delta$).
+\il
+
+
+\subsection{Parameterized Systems}
+
+The \emph{parameterized ring} is the function $\pring: n \mapsto \pring(n)$,
+where $n \in \bbN$ and $\pring(n)$ is the ring with $n$ vertices.
+A \emph{parameterized token-ring system} is a function $P^\pring: n \mapsto P^{\pring(n)}$,
+where $n\in\bbN$ and $P$ is a given process template.
+To disambiguate, we explicitly write
+``parameterized [fully asynchronous][interleaving][synchronous] token-ring system''.
+
+
+
+\subsection{Parameterized Specifications}\label{tok_rings:defs:indexed-ltl}
+
+\emph{Parameterized specification} is a tuple $\tpl{\Ipr,\Iglob,\Opr,\Phi}$,
+where $\Ipr$ is a set of process template inputs (global and local),
+$\Iglob$ is a set of global inputs,
+$\Opr$ is a set of process template outputs,
+and $\Phi$ is an indexed LTL formula over $\Ipr$ and $\Opr$.
+Intuitively, an indexed LTL formula is an LTL formula with indexed variables and quantification over indices.
+Below we define indexed LTL and its sublogic, prenex-indexed LTL.
+
+\subsection*{Indexed LTL}
+
+\parbf{Syntax}
+Let $\VarNames$ denote the set of variable names (that will be used as process indices).
+Let $cond$ be a Boolean formula over atoms of the form $x = y$ or $x = y+1$,
+for arbitrary $x,y$ from $\VarNames$.
+Then an indexed LTL formula $\Phi$ over $\Ipr$, $\Iglob$, and $\Opr$ has the grammar:
+%
+\begin{align*}
+\Phi ~=~ & \forall v. (cond \impl \Phi) \| \exists v. (cond \land \Phi) \| \\
+         & \Phi\land\Phi \| \neg \Phi \| \\
+         & e \| i_v \| o_v \| \Phi \U \Phi \| \X_v \Phi
+\end{align*}
+%
+where $v \in \VarNames$, $i \in \Iloc$, $o \in \Opr$, $e\in \Iglob$.
+We will write $\forall x \neq y:\Phi$ instead of $\forall x\forall y: (x \neq y) \impl \Phi$,
+and $\exists x \neq y:\Phi$ instead of $\exists x\exists y: x \neq y \land \Phi$.
+
+\parbf{Semantics}
+We define the semantics for sentence formulas only:
+a formula $\Phi$ is a \emph{sentence} iff every variable $v$ mentioned in the formula
+is in the scope of a quantifier over that variable.
+E.g., $r_x$ is not a sentence, while $\forall x: r_x$ is.
+
+Let $\Phi$ be a sentence.
+Let $P^R$ be a token-ring system with $R=(V,E)$ and $\pi$ be an infinite run of the system.
+Define $\pi\models \Phi$ iff $\pi \models \Phi_V$ (this satisfaction is defined later),
+where $\Phi_V$ is constructed from $\Phi$ as follows.
+\li
+\-[1.]
+Replace every single-quantified subformula $\forall v.\phi$ of $\Phi$
+with $\bigwedge_{i \in V} \phi[v \mapsto i]$;
+replace every single-quantified subformula $\exists v.\phi$
+with $\bigvee_{i \in V} \phi[v \mapsto i]$.
+Here $\phi[v \mapsto i]$ denotes the formula $\phi$
+in which $v$ is substituted by $i$.
+E.g., $r_x[x \mapsto 5]$ is $r_5$.
+
+\-[2.]
+Repeat step (1) until all quantifiers disappear.
+The resulting formula is $\Phi_V$.
+Note that conditions $cond$ like $x\neq y$ get simplified into $\true$ or $\false$.
+\il
+E.g., $\exists x\exists y.x\neq y \land g_x \land g_y$ becomes
+$\bigvee_{(x,y) \in V\times V}.x\neq y \land g_x\land g_y$.
+
+\parbf{Definition of ``system satisfies $\Phi$''}
+Fix a $P=(\Ipr,\Opr,Q,Q_0,\delta,out)$,
+global inputs $\Iglob$, and a token ring $R=(V,E)$.
+Let $\Phi$ be an indexed LTL over $\Ipr$, $\Opr$, and $\Iglob$.
+Then $P^R \models \Phi$ iff for every infinite system run $\pi$: $\pi\models\Phi$.
+An infinite system run $\pi=(s_1,in_1,M_1) (s_2, in_2, M_2) ... \in (S\times 2^{\Isys}\times 2^V)^\omega$
+satisfies $\Phi$
+iff
+$(Out(s_1),in_1) (Out(s_2), in_2)... \models \Phi_V$.
+The latter satisfaction is standard except for the operator $\X$.
+Given a $v \in V$ and the original run,
+$(Out(s_1),in_1) (Out(s_2), in_2)... \models \X_v \varphi$
+iff
+$(Out(s_i),in_i) (Out(s_{i+1}), in_{i+1})... \models \varphi$
+where $i$ is the second\footnote{Why ``second'', not the first one?
+  This is the consequence of the fact that we group the input \emph{to be read} with the current output.
+  E.g., $\X_v r_v$ should refer to $r_v$ read when transiting \emph{from} the next state
+  rather than referring to $r_v$ read when transiting \emph{into} the next state.}
+  smallest $i$ such that $v \in M_i$.
+Intuitively, $\X_v \varphi$ requires $\varphi$ to hold on the suffix run
+that skips one transition of the process $v$ and that starts with $v$ transiting.
+In formulas of the form $\forall i.(...\X_i...)$,
+we usually skip the subscript in $\X_i$ and write $\X$.
+(The next operator $\X_i$ presented here is inspired by the action-based semantics from~\cite{Emerso03}.)
+
+\subsection*{Prenex-indexed LTL}
+
+Let us abbreviate by $\forall x_{cond}.\phi$ the formula $\forall x.cond \impl \phi$,
+and by $\exists x_{cond}.\phi$ the formula $\exists x. cond \land \phi$.
+When the quantifier is not important, we write $Q x_{cond}.\phi$.
+
+An indexed LTL formula $\Phi$ is \emph{prenex-indexed} iff it is of the form
+$$
+Q {v^1}_{cond_{v^1}}...Q {v^k}_{cond_{v^k}}: \phi.
+$$
+We call $\Phi$ \emph{$k$-indexed}, because it has $k$ quantifiers.
+Let $\LTLmX$ refer to LTL formulas that do not use $\X$.
+
+Note that prenex-indexed \LTL is not as expressive as (non-prenex) indexed LTL.
+For example, formula $\F\forall x. p_x$ does not have an equivalent prenex-indexed form.
+
+Most of existing and our cutoff results are restricted to prenex-indexed LTL formulas
+with the empty set of global inputs.
+
+\begin{remark}[$\forall i.A_i \impl \forall j.G_j$ is not prenex-indexed]\label{tok_rings:rem:gr1-not-prenex}
+In the previous section we defined ``a system satisfies an indexed LTL formula''.
+If we use the path quantifier $\A$ explicitly,
+then, as usually, a system satisfies an LTL formula $\varphi$,
+$sys\models \varphi$, is equivalent to $sys \models \A\varphi$,
+where $\varphi$ is treated as a path formula of \CTLstar.
+Now consider $\forall i.A_i \impl \forall j.G_j$.
+If rewritten with the path quantifier $\A$, it is $\A(\forall i.A_i \impl \forall j.G_j)$.
+There is no way to turn it into the form $Q {v^1}... Q {v^k} \A \phi$
+and this formula is not prenex-indexed.
+\end{remark}
+
+
+\subsection{Parameterized Synthesis Problem}
+The \emph{parameterized synthesis problem (for token rings)} is:
+
+\smallskip\noindent
+\emph{Given}: parameterized specification $\tpl{\Ipr,\Iglob,\Opr,\Phi}$ \\
+\emph{Return}: process template $P=(\Ipr,\Opr,Q,q_0,\delta,out)$ such that
+          for every $n$: $P^{\pring(n)} \models \Phi$,
+          or ``unrealizable'' if no such template exists.
+\smallskip
+
+We can similarly define the parameterized \emph{model checking} problem,
+in which the process template is given as input.
+
+Furthermore, we will use the variants of these problems,
+which ask whether all systems \emph{larger than a given $n_0$}
+satisfy the formula.
+We call such problems {\em parameterized$_{>n_0}$}.
+
+The parameterized synthesis for token rings is undecidable~\cite{JB14},
+even for prenex 2-indexed specifications without global inputs:
+\begin{theorem}[\cite{JB14}, Theorem 3.5]\label{tok_rings:thm:param-synth-is-undec}
+The parameterized synthesis problem of interleaving token rings,
+without global inputs,
+formulas $\forall i \neq j. \varphi(i,j)$,
+is undecidable,
+where $\varphi(i,j)$ is an $\LTLmX$ formula over processes $i,j$.
+\end{theorem}
+\noindent This result follows from the undecidability of synthesis of
+distributed systems with two processes~\cite{DBLP:conf/focs/PnueliR90}.
+The problem \emph{is} decidable for prenex 1-indexed specifications.
+
+
+\section{Reduction by Cutoffs}\label{tok_rings:sec:reduction}
+
+The definition of a cutoff is the same as in Section~\ref{gua:sec:paramsynt} on page~\pageref{gua:sec:paramsynt},
+we repeat it here for completeness.
+A \emph{cutoff} for parameterized specification $\tpl{\Ipr,\Iglob,\Opr,\Phi}$ 
+and process template $P=(\Ipr,\Opr,Q,Q_0,\delta,out)$ is a number $c \in \bbN$ such that
+$$
+\forall n \geq c. \big(P^{\pring(c)} \models \Phi ~\Iff~ P^{\pring(n)} \models \Phi\big).
+$$
+
+Cutoffs reduce the parameterized synthesis and model checking problems to
+their non-parameterized variants.
+E.g., if the cutoff is $2$
+then the answer to the parameterized$_{> 2}$ model checking problem
+``$\forall n>2: P^{\pring(n)} \models \Phi$''
+is the same as the answer to the non-parameterized model checking problem
+``$P^{\pring(2)} \models \Phi$''.
+
+\subsection*{Known Cutoffs}
+
+  In a seminal paper~\cite{Emerso95b,Emerso03} Emerson and Namjoshi proved the following cutoff results.
+  \begin{theorem}[\cite{Emerso03}] \label{tok_rings:thm:cutoffs}
+    Let $P=(\Ipr,\Opr,Q,Q_0,\delta,out,A_{loc})$ be a process template,
+    $\Iglob=\emptyset$ (no global inputs),
+    $\tpl{\Ipr,\Opr,\Phi}$ a parameterized specification.
+    Assume that the scheduler is interleaving.
+    Then $c$ is a cutoff depending on $\Phi$:
+    \li
+    \- $c=2$ for $\forall i.~ \phi(i)$,
+    \- $c=3$ for $\forall i.\forall j_{j=i+1}.~ \phi(i,i+1)$,
+    \- $c=4$ for $\forall i.\forall j_{i\neq j}.~ \phi(i,j)$,
+    \- $c=5$ for $\forall i.\forall j_{i\neq j}.\forall k_{k=i+1}.~ \phi(i,i+1,j)$.
+    \il
+  \end{theorem}
+
+  The above cutoff results are restricted to token-ring architectures
+  and do not allow for specifications of the more general $k$-indexed form.
+  Later in~\cite{AJKR14} we extended the results to more general networks (directed graphs),
+  where the processes can control the directions in which to send and receive the token,
+  and systems can pass more than one token.
+  The paper also studied $k$-indexed \CTLstar properties,
+  also with a bounded alternation depth of path quantifiers.
+
+
+\section{Bounded Synthesis of Parameterized Token Rings}\label{tok_rings:sec:bs-and-optimizations}
+
+\subsection{SMT Encoding}
+
+We encourage the reader to revisit Chapter~\ref{defs:bounded_synthesis} on page~\pageref{page:defs:bounded_synthesis}
+to recall how bounded synthesis works in the case of non-distributed systems.
+We adapt the encoding to the case of (distributed) token ring systems as follows.
+
+Let us start with SMT constraint about a process template.
+
+\parbf{SMT constraints for a process template}
+Let us encode the definition of process template from
+Section~\ref{tok_rings:defs:system} on page~\pageref{tok_rings:eq:process-trans}:
+%
+%\footnote{We could also encode this into LTL,
+%  but using SMT constraints is more efficient.%
+%}:
+\li
+\- Introduce a special output $\token: T \to \bbB$
+   such that $\token(t)$ holds iff $t \in T$
+   (recall that we divide the states $Q = T\cupdot NT$).
+   Let us encode Eq.~\ref{tok_rings:eq:process-trans} (on page~\pageref{tok_rings:eq:process-trans}),
+   which specifies:
+   a process template can send the token only if it has the token;
+   sending the token means a process template loses the token;
+   if a process template receives the token and currently does not have it,
+   then it has the token after the transition.
+   \begin{equation} \label{tok_rings:eq:snd_rcv_tok}
+   \forall_i. \G\left[
+   \begin{array}{l}
+     \tsnd_i \impl \token_i \\
+     \token_i \impl (\tsnd_i \iff \X\neg\token_i)\\
+     \neg\token_i \impl (\trcv_i \iff \X\token_i)
+   \end{array}
+   \right]
+   \end{equation}
+%
+\- What is left is the condition $(\dagger)$ from the process template definition.
+   We introduce the following LTL formula:
+   \begin{equation}\label{tok_rings:eq:tok_release}
+   \forall i.~(A_{loc})_i \impl \G(\token_i \impl \F \tsnd_i),
+   \end{equation}
+   i.e., a process does not lock the token if the fairness condition $A_{loc}$ is satisfied.
+
+\il
+
+\parbf{SMT constraints for a system}
+Now let us encode particularities of (distributed) token-ring systems.
+
+\li
+
+\- We compose the system transition function out of process transition functions.
+   Note that all processes share the \emph{same} transition function;
+   the input arguments to the function reflect for what process it is used.
+   To account for scheduling,
+   we introduce additional system inputs $\sch_1, ..., \sch_k$
+   (where $k$ is the number of processes in a ring),
+   and require that a process $i \in \{1,...,k\}$ can transit only when $\sch_i$ is true
+   (and hence a process does not see its inputs when it is not scheduled).
+
+\- The scheduler model (asynchronous/synchronous/interleaving) defines the constraints
+   on the scheduling variables $\sch_1,...,\sch_k$.
+   For synchronous token rings, all scheduling variables are set to true.
+   For interleaving scheduling, exactly one of the scheduling variables is set to true,
+   except for the token-passing transitions where the two processes transit simultaneously.
+   For asynchronous scheduling, any number (including zero) of the scheduling variables can be true.
+   To specify fair scheduling (for the interleaving or asynchronous cases),
+   we use the constraint $\bigwedge_i \GF sch_i$.
+   This constraint is added as the assumption to the original formula,
+   when we translate the formula into an automaton.
+   \ak{why it does not break prenex-indexed formulas?}
+
+\- To ensure that the topology is the token ring
+   (where every process sends the token to its single neighbor),
+   we manipulate process input $\tsnd$ and output $\trcv$ in the natural way.
+   For example,
+   if process $i$ is ready to send the token, i.e., it is in a state $t$ and $\tsnd(t)$ holds,
+   then once it is scheduled we set $\trcv_{i+1}$ to true.
+   I.e., $\tsnd_{i}$ is connected to $\trcv_{i+1}$:
+   \begin{equation*}
+   \G [\tsnd_i \iff \trcv_{i+1}]
+   \end{equation*}
+\il
+
+Thus, given an LTL formula $\varphi$,
+we want to synthesize a token-ring system that satisfies:
+\begin{equation}\label{tok_rings:eq:full_formula}
+\boxed{
+\forall i. (\GF\sch_i \land \G(\tsnd_i \iff \trcv_{i+1}))
+~\impl~
+  \varphi \land \forall_i\left(
+   \begin{array}{l}
+     \G [\tsnd_i \impl \token_i] \\
+     \G [\token_i \impl (\tsnd_i \iff \X\neg\token_i)] \\
+     \G [\neg\token_i \impl (\trcv_i \iff \X\token_i)] \\
+     (A_{loc})_i \impl \G(\token_i \impl \F \tsnd_i)
+   \end{array}
+   \right)
+}
+\end{equation}
+
+\begin{example}\label{tok_rings:ex:simple_arb}
+Consider a specification of a simple arbiter.
+A process template has inputs $I=\{r,\trcv\}$, outputs $O=\{g,\tsnd\}$,
+the original parameterized LTL formula specifying the arbiter is:
+$$
+\begin{array}{rl}
+  \forall i \neq j. & \G \neg ( g_i \land g_j ) \\
+         \forall i. & \G (r_i \impl \F g_i) \land \neg g_i.
+  \end{array}
+$$
+By Theorem~\ref{tok_rings:thm:cutoffs}, the cutoff is 4.
+We set $A_{loc}=\true$, instantiate the above formula, and synthesise a token-ring system.
+The process synthesised using our tool PARTY~\cite{party} is in Figure~\ref{tok_rings:fig:simple_arb}.
+
+\begin{figure}[tb]\center
+\input{token-systems/figures/simple_arb.tikz}
+\caption{Process template synthesized from the specification of a simple arbiter
+ (Example~\ref{tok_rings:ex:simple_arb}).
+ There are two initial states, with and without the token.
+ The blue-filled states have the token,
+ the double state has $g$, the others have $\neg g$.
+ The process template grants whenever it has the token (except for the initial state),
+ ignoring the request.
+ The exclusivity of the token ensures the mutual exclusion of the grants.}
+\label{tok_rings:fig:simple_arb}
+\end{figure}
+\end{example}
+\ak{if you call it SMT encoding, then you need to provide an example of the constraints}
+
+
+\subsection{Optimizations} \label{tok_rings:sec:optimizations}
+
+In this section we describe high-level optimizations that are not specific to the SMT encoding.
+The first two optimizations, \emph{incremental solving} and \emph{modular generation of constraints},
+are sound and complete.
+The third, \emph{specification strengthening},
+is based on automatic rewriting of the specification and introduces incompleteness.
+The last optimization, \emph{hub-abstraction} is sound and complete.
+
+\subsubsection{Incremental Solving}
+
+Theorem~\ref{tok_rings:thm:cutoffs} states that it is sufficient to synthesize a token ring of cutoff size $c$.
+However, a solution for a smaller number of processes can still be correct in bigger rings.
+We propose to proceed incrementally, synthesizing first a ring of size 1, then 2, ..., up to $c$.
+After synthesizing a process that works in a ring of size $n$,
+we check whether it satisfies the specification also in a ring of size $n+1$.
+Only if the result is negative,
+we start to synthesize a ring of size $n+1$.
+
+\subsubsection{Modular Constraints for Conjunctive Properties}
+
+A useful property of the SMT encoding for parameterized synthesis is that
+we can separate conjunctive specifications into their parts,
+generate constraints for the parts separately,
+and then search for a solution that satisfies the conjunction of all constraints.
+In the following,
+for a parameterized specification $\varphi$ and a number of processes $k$,
+let $C(\varphi,k)$ be the set of SMT constraints generated by the bounded synthesis procedure.
+Note that $C(\varphi,k)$ is of the form $\exists P (...)$.
+When a process template $P$ is given,
+let ``$P \models C(\varphi,k)$'' mean that the constraints $C(\varphi,k)$ are satisfied
+when instantiated with the process $P$.
+\begin{theorem}
+Let $\varphi_1$ and $\varphi_2$ be prenex-indexed formulas
+such that $n_1$ is a cutoff for $\varphi_1$ and $n_2$ is a cutoff for $\varphi_2$.
+Then:
+$$
+P \models C(\varphi_1,n_1) \land C(\varphi_2,n_2) ~~\Impl~~
+P^{\pring(k)} \models \varphi_1 \land \varphi_2 \textit{~~for every~} k \geq max(n_1,n_2).
+$$
+\end{theorem}
+
+The theorem allows us to use different cutoffs for sub-parts of a formula.
+By conjoining the resulting constraints of all parts,
+we obtain an SMT problem such that every solution satisfies the complete formula.
+For example, for a formula
+$$
+\begin{array}{ll}%
+\forall i \neq j.~ & \G \neg ( g_i \land g_j ) \\
+\forall i.~ & \G (r_i \impl \F g_i),
+\end{array}
+$$
+we generate constraints for a ring of size $4$ for the first conjunct,
+and we generated constraints for a ring of size $2$ for the second conjunct.
+This is useful for formulas where the local (1-indexed) part is more complex than the global part,
+like our more complex arbiter examples.
+
+
+\subsubsection{Specification Strengthening and Handling Assumptions} \label{tok_rings:sec:localising}
+
+To handle specifications in assume-guarantee style,
+we strengthen them in two rewriting steps,
+which are sound but incomplete.
+This turns them into the prenex-indexed form
+(the only form, for which we know how to do parameterized synthesis).
+
+Consider a formula in assume-guarantee style $A_L \land A_S \impl G_L \land G_S$,
+where each of the conjuncts is in the prenex-indexed form,
+and $L$ and $S$ denote respectively liveness and safety.
+Notice that this formula, as a whole,
+  is \emph{not} in prenex-indexed form,
+  since it contains process quantifiers inside the path quantifier $\A$
+  (if written explicitly, it says $\pforall (\forall i... \impl \forall j...)$,
+  which is 2-indexed but not \emph{prenex}-indexed).
+
+\parbf{Safety-liveness assumptions}
+Our first strengthening is based on the intuition that
+often $A_L$ is not needed to obtain $G_S$,
+so we strengthen the formula to $(A_S \impl G_S) \land (A_L \land A_S \impl G_L)$.
+This step is incomplete for specifications where the system can
+falsify liveness assumptions $A_L$ and therefore ignore guarantees,
+or if the assumptions $A_S \land A_L$ are unrealizable but $A_S$ is realizable.
+Both of the cases often hint at the problems with the specification%
+\footnote{The well known class of GR1 specifications~\cite{Bloem12},
+  which can be used to describe industrial systems,
+  does not use liveness assumptions for safety guarantees.
+  Furthermore, for GR1 specifications Klein and Pnueli~\cite{Klein10}
+  describe a similar separation of safety guarantees from liveness assumptions.
+  They introduce ``well separated'' assumptions,
+  which are such that the system cannot falsify them at any state,
+  and show that ``well separation'' of assumptions is sufficient for the rewriting to be sound.
+  Incomplete cases represent specifications where the system can falsify assumptions and ignore guarantees.%
+  }.
+
+
+\parbf{Localizing assumptions}
+Consider a $2$-indexed formula in assume-guarantee style,
+$\forall_i A_i \impl \forall_j G_j$,
+where $A_i$ and $G_j$ refer to process $i$ and $j$ respectively.
+Originally,
+we want to plug this formula into Eq.~\ref{tok_rings:eq:full_formula}
+and synthesize for the resulting formula.
+Instead,
+we localize it---turn $(\forall i...) \impl (\forall j...)$ into $\forall i (... \impl ...)$---and get:
+\begin{equation}\label{tok_rings:eq:localised}
+\forall i:~ \big(\!\GF\sch_i \land \G(\tsnd_i \iff \trcv_{i+1})\big)
+\impl
+  \left(
+   \begin{array}{l}
+     \G [\tsnd_i \impl \token_i] \\
+     \G [\token_i \impl (\tsnd_i \iff \X\neg\token_i)] \\
+     \G [\neg\token_i \impl (\trcv_i \iff \X\token_i)] \\
+     A_i \impl \G(\token_i \impl \F \tsnd_i) \\
+     A_i \land \GF \token_i \impl G_i
+   \end{array}
+   \right)
+\end{equation}
+A few notes:
+\li
+
+\- This formula implies the original formula Eq.\ref{tok_rings:eq:full_formula}
+   where we set $\varphi = \forall_i A_i \impl \forall_i G_i$ and $A_{loc}=A_i$.
+   Setting $A_{loc} = A_i$---%
+   requiring $\G(\token_i \impl \F \tsnd_i)$ to hold under the assumption $A_i$---%
+   is reasonable:
+   it says that if the environment violates the assumption $A_i$,
+   then we are not required to release the token.
+   Note that if token releasing is required despite $A_i$,
+   then the rewriting is unsound
+   (it may result in incorrect solutions wrt.\ Eq.\ref{tok_rings:eq:full_formula}).
+
+\- In this formula,
+   the non-technical part (where the technical part encodes the token-ring properties)
+   is in the \emph{prenex}-indexed fragment.
+   Indeed, the non-technical part corresponds to $\forall i.~(A_i \land \GF\token_i \impl G_i)$,
+   which is prenex 1-indexed LTL formula.
+   In contrast, the original formula $\forall i.A_i \impl \forall j.G_j$ is \emph{not} prenex-indexed,
+   because it corresponds to $\A(\forall i.A_i \impl \forall j.G_j)$,
+   if we explicitly write the path quantifier $\A$.
+   Hence for the new formula we can use the cutoff results of Theorem~\ref{tok_rings:thm:cutoffs},
+   but we could not for the original one.
+
+\- Adding $\forall_i \GF\token_i$ to the first constraint is crucial.
+   Otherwise,
+   the final formula becomes too restrictive and we may miss solutions.
+   The reason why $\G\F\token_i$ may prevent this is that
+   $\G\F\token_i$ may work as a local trigger of a violation of an assumption.
+   This is confirmed in the ``Pnueli'' arbiter experiment,
+   where a violation of one of the assumptions $A_i$ prevents fair token passing in the ring,
+   falsifying $\G\F\token_j$ for all $j\neq i$.
+
+\- Filiot et al.~\cite{Filiot11} describe a similar rewriting heuristic,
+   in the context of monolithic synthesis.
+   Our version differs in that we add $\GF\token_i$ assumptions
+   before localization to prevent missing the solutions.
+
+\il
+
+
+\subsubsection{Hub-abstraction}
+
+  Inspired by the work~\cite{Clarke04c}, we introduce the hub abstraction optimization.
+  Recall that for 1-indexed properties $\forall i.\varphi(i)$, a cutoff is 2,
+  meaning that it is enough to consider a token ring system with two processes.
+  Furthermore, by symmetry of the processes,
+  it holds that
+  $P^{\pring(2)}\models \forall i. \varphi(i) \Iff P^{\pring(2)} \models \varphi(1)$
+  (for details, see~\cite{Emerso03}).
+  The hub abstraction suggests to replace the process $P_2$ of a system with the hub process
+  whose whole purpose is to pass the token.
+  This may reduce the state space,
+  because we replace the original process $P_2$ by the small hub process.
+  We emulate the hub process using the environment assumptions,
+  thus considering only one real process.
+  The assumptions are:
+  \li
+  \-[(1)]
+     if the process does not have the token,
+     then the environment eventually sends the token (raises the input $\trcv$):
+     $\G ( \neg \token \impl \F \trcv)$,
+
+  \-[(2)]
+     if the process has the token, then the environment does not send the token:
+     $\G ( \token \impl \neg\trcv )$.
+  \il
+  The final formula to synthesize is:
+  \begin{equation}\label{tok_rings:eq:hub-abstraction}
+  \big(\!\GF\sch \land \G(\neg\token \impl \F\trcv) \land \G(\token \impl \neg\trcv)\big)
+  ~\impl~
+    \varphi \land \left(
+     \begin{array}{l}
+       \G [\tsnd \impl \token] \\
+       \G [\token \impl (\tsnd \iff \X\neg\token)] \\
+       \G [\neg\token \impl (\trcv \iff \X\token)] \\
+       A_{loc} \impl \G(\token \impl \F \tsnd)
+     \end{array}
+     \right)
+  \end{equation}
+
+  Note that the assumption (1) states that the token cannot get stuck
+  in the hub process (and thus in the original process that the hub abstracts).
+  This does not always hold,
+  because we only require to pass the token if $A_{loc}$ holds.
+  This means that the hub-abstraction is not sound wrt.\ Eq.\ref{tok_rings:eq:full_formula},
+  i.e.,
+  there is a process $P$ (and $A_{loc}$) and $\forall i.\varphi(i)$ such that
+  $P \models \text{Eq.\ref{tok_rings:eq:hub-abstraction}}$
+  but $P^{\pring(2)} \not\models \text{Eq.\ref{tok_rings:eq:full_formula}}$.
+
+  However, we will use the hub abstraction in the context of assume-guarantee 1-indexed specifications
+  in the form of Eq.\ref{tok_rings:eq:localised} (``$\forall i.A_i \land \GF\token_i \impl G_i$'').
+  Since Eq.\ref{tok_rings:eq:localised} only requires the guarantee to hold on paths
+  where the token is passed infinitely often,
+  the following result holds.
+
+  \begin{theorem}
+    For every process template $P$
+    and LTL formula $\varphi$ of the form $A \impl G$:
+    $$
+    P \models \text{Eq.\ref{tok_rings:eq:hub-abstraction} (where $A_{loc}=A$)}
+    ~~\Impl~~
+    P^{\pring(2)} \models \text{Eq.\ref{tok_rings:eq:localised}}.
+    $$
+  \end{theorem}
+
+Furthermore, we can replace $\GF\sch$ with \emph{true}, which can introduce unsoundness wrt.\ Eq.\ref{tok_rings:eq:localised}.
+But this step is sound for formulas where the environment cannot
+violate guarantees by not scheduling a process.
+This is true for all examples we consider in the next section.
+
+
+\subsection{Evaluating Optimizations}\label{tok_rings:optimisations:experiments}
+
+For the evaluation of optimizations we developed an automatic
+parameterized synthesis tool PARTY~\cite{party}.
+The tool and the benchmarks are available at {\small\url{https://github.com/5nizza/Party/}}.
+PARTY
+\li
+\-[(1)] identifies the cutoff of a given LTL specification,
+\-[(2)] adds token-ring specific guarantees and assumptions to the specification,
+\-[(3)] translates the modified specification into a UCT using LTL3BA~\cite{LTL3BA},
+\-[(4)] for a given cutoff and system size bound, builds the SMT constraints,
+\-[(5)] solves the constraints using SMT solver Z3 v.4.1~\cite{Moura08}.
+        If the solver reports unsatisfiability,
+        then no model for the current bound exists,
+        and the tool goes to step 4 and increases the bound until
+        the user interrupts execution or a model is found.
+        A model synthesized represents a Moore machine
+        that can be copied to form a token-ring system of any size.
+\il
+
+We run the experiments on a single core of a Linux machine
+with two 4-core 2.66 GHz Intel Xeon processors and 64~GB RAM.
+Reported times in tables include all the steps of the tool.
+For long running examples, SMT solving contributes most of the time. 
+Timings reported in tables are timings of one particular run,
+although we observed that the behaviour of optimizations timings does not change much on different runs.
+
+For the evaluation of optimizations we run the tool,
+with different sets of optimizations enabled,
+on three examples:
+a simple arbiter, a full arbiter, and a ``Pnueli'' arbiter.
+All benchmarks contain the mutual exclusion property $\forall i \neq j. \G\neg g_i \land g_j$,
+for which a cutoff is $4$ according to Theorem~\ref{tok_rings:thm:cutoffs}.
+We show solving times in Table~\ref{tok_rings:tab:opt}.
+The horizontal axis of the table has columns for token rings of different sizes.
+Each successive optimization below includes previous optimizations.
+
+\parbf{Incremental solving}
+% \todo{redo experiment: check solution for ring 6}
+% LTL3BA fails to produce automaton for rings of size 6 in a reasonable time
+Solving times can be sped up considerably by synthesizing a ring of size $2$,
+then checking whether the solution is correct for a ring of size $4$.
+For instance, for the full arbiter, the general solution was found in $\approx\!24$ seconds
+when synthesizing a ring of size $2$ (time from the ``original'' row in Table~\ref{tok_rings:tab:opt}).
+Checking if the solution is correct for a ring of size $4$ takes additional $\approx\!30$ seconds,
+thus reducing the synthesis time from more than 2 hours (column ``full4'' in the same row)
+to $\approx\!54$ seconds.
+Times for incremental solving are not given in the table,
+because its contribution is small when optimizations ``strengthening'', ``modular'', and ``async hub'' are applied.
+
+\parbf{Strengthening}
+This version refers to two optimizations described in Section~\ref{tok_rings:sec:optimizations}:
+localizing of assume-guarantee properties and
+rewriting liveness assumptions from properties with safety guarantees.
+Formula rewriting significantly reduces the size of the automaton:
+for example, the automaton corresponding to the ``Pnueli'' arbiter in a ring of size 4
+reduces its size from 1700 to 31 states
+(from 41 to 16 for the full arbiter).
+
+\parbf{Modular}
+In this version,
+constraints for formulas of the form $\phi_i \land \phi_{i,j}$ are
+generated separately for local properties $\phi_i$ and for global properties $\phi_{i,j}$,
+using the same symbols for transition and output functions.
+Constraints for $\phi_i$ are generated for a ring of size 2,
+and constraints for $\phi_{i,j}$ for a ring of size 4.
+These sets of constraints are then conjoined in one query and given to the SMT solver.
+Such separate generation of constraints leads to smaller automata and queries,
+resulting in approximately $10$x speed up.
+
+\parbf{Hub abstractions}
+By replacing one of the processes in a ring of size 2 with assumptions on its behavior,
+we reduce the synthesis of a ring of size two to the synthesis of a single process.
+In row ``async hub'' the process is synthesized in an asynchronous setting,
+while in row ``sync hub'' the process is assumed to be always scheduled.
+On these examples, the speed up is insignificant.
+
+\begin{table}[tb]
+\caption{Effect of optimizations on synthesis time (in seconds, t/o=2h)}
+\label{tok_rings:tab:opt}
+\small
+\centering
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{ lrrrrrrrrr }
+\toprule
+ & simple4 & full2 & full3 & full4 & pnueli2 & pnueli3 & pnueli4 & pnueli5 & pnueli6 \\
+\midrule
+% some older results
+original          & 3 & 24   & 934 & t/o & 23 & 6737 & t/o & t/o & t/o\\
+% results_Oct19_11_28/
+strengthening    & 1 & 6 & 81 & 638 & 2 & 13 & 90 & 620 & 6375 \\
+% results_Oct19_11_28/
+modular           & 1 & 4 & 8 & 13 & 2 & 4 & 11 & 49 & 262 \\
+% results_Oct19_11_28/
+async hub               & 1 & 2 & 2 & 5 & 2 & 3 & 9 & 37 & 236 \\
+% results_Oct19_11_28/
+sync hub                & 1 & 1 & 2 & 4 & 2 & 3 & 8 & 42 & 191 \\
+\midrule
+total speedup      & $3$ & $20$ & $10^2$ & $\ge\!\!10^3$ & $10$ & $10^3$ & $\ge\!\!10^3$ & $\ge\!\!10^2$ & $\ge\!\!40$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% \subsection{Simplified GenBuf}
+% This specification is simplified in a sense that we removed some signals: enq, deq, full, empty - everything connected to FIFO. Some statistics about this GenBuf2:
+% \begin{itemize}
+% \item 13 safety assumptions and 22 safety guarantees
+% \item 2 liveness assumptions and 5 liveness guarantees
+% \item all the assumptions are 1-indexed (the same as Pnueli arbiter)
+% \item 20/27 guarantees are 1-indexed, 7 guarantees are 2-indexed \todo{case of 2 processes, what about more processes?}
+% \item all safety guarantees are of transition class (refers to current state or to current and next state) (but they have assumptions! \emph{Is it complete to ignore safety assumptions for transition guarantees?})
+% \item $automaton(A_S \land A_L \impl G_L \land G_S)) = 1808$ nodes
+% \item $automaton((A_S \impl G_S)\land(A_S \land A_L \impl G_L)) = 1359$ nodes (strengthening)
+% \item $automaton(A_S \land A_L \impl G_S) = 1226$ nodes
+% \item $automaton(A_S \land A_L \impl G_L) = 819$ nodes
+% \item $automaton(A_S \impl G_S) = 540$ nodes
+% \item $automaton(A_L \impl G_L) = 60$ nodes
+% \item $automaton(A_S \land A_L) = 18$ nodes
+% \item $automaton(G_S \land G_L) = 34$ nodes
+% \item $automaton(A_S) = 14$ nodes
+% \item $automaton(A_L) = 3$ nodes
+% \item $automaton(G_S) = 20$ nodes
+% \item $automaton(G_L) = 11$ nodes
+% \end{itemize}
+
+% \emph{It took 30 min to figure out unrealizability of genbuf2 with 2 states with bounded synthesis tool: 15min ltl3ba, 15min SMT.}
+
+% \note{The GenBuf contains all the components incterconnected, but they can decomposed into a different parts - FIFO, set of clients handlers, set of FIFO dispatchers.}
+% \note{RiSE proposal has idea of half-manual decomposition -- when the user separates signals into different modules. Is it worth to do this automatically?}
+
+% How to translate to token rings? Genbuf contains two quite independent parts -- set of client handlers (transmit data from clients to FIFO), and a set of dispantchers (dispatch data from FIFO and send it to recievers). Therefore there might be two independent token rings -- one for dispatchers, one for handlers. And the synthesis of dispatchers and handlers can be done indendently or together. If do it together
+
+% \subsection{Simplified Load Balancer}
+% Load balancer we consider is simplified, because it does not contain the priority property -- the first server should always handle the job if it is free. We had to remove this property, because  Therefore the modified version of Load Balancer is: ...
+
+%\smallskip \noindent \textbf{Remarks.} 
+%It should be noted that our set of experiments is relatively small, and that SMT
+%solvers are sensitive to small changes in the input.  Thus, the
+%experiments would certainly benefit from a larger set of benchmarks,
+%and the individual comparison of any two numbers in the table should
+%be taken with a grain of salt.  At the same time, the table shows a
+%clear and significant improvement of the solving time when all
+%optimizations are turned on.
+
+
+\subsection{Discussion}
+
+We showed how optimizations of the SMT encoding, along with modular application of cutoff results, strengthening and abstraction techniques, leads to a significant speed-up of parameterized synthesis. Experimental results show speed-ups of more than three orders of magnitude for some examples.
+
+%The current bottleneck of SMT-based bounded (and thus, parameterized) synthesis is the construction of the UCT automaton. In our experiments, LTL3BA could not generate the UCT for an AMBA arbiter with only 1 client within two hours. Therefore, we think that it will be important to develop techniques that help us to avoid construction of the whole automaton (for example by separate tracking of assumptions and guarantees violations, as in~\cite{Ehlers12}).
+
+In the next section,
+we use these optimizations to tackle AMBA specification.
+This will not work out of the box and we will introduce more tricks specifically tailored to the AMBA.
+
+\input{token-systems/amba-study}
+
+
+\section{Conclusion}\label{tok_rings:sec:conclusion}
+
+In this chapter,
+we studied the parameterized synthesis of token-ring systems from the applied perspective.
+The starting point was the original approach of Bloem and Jacobs~\cite{JB14},
+which could be applied only to toy specifications.
+We suggested several optimizations that made
+it applicable to larger ``made-up'' specifications.
+Then we tackled the real-life specification, that of the AMBA bus protocol,
+and suggested further optimizations.
+This required us to extend the theory behind the approach.
+In the end,
+we synthesized a solution for the AMBA specification in the parameterized sense,
+for the first time ever.

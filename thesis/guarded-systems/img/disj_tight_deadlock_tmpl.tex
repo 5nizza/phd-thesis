@@ -1,0 +1,45 @@
+\begin{tikzpicture}[node distance=2.4cm,inner sep=1pt,minimum size=0.5mm,->,>=latex]
+
+\node[initial left, state] (b_1) {$1_B$};
+\node[state] (b_2) [right of=b_1] {$2_B$};
+\node (dots) [right of=b_2] {$\ldots$};
+\node[state] (b_k) [right of=dots] {$k_B$}; 
+
+\path (b_1) edge [above] node {$\disj{1_B}$} (b_2);
+\path (b_2) edge [above] node {$\disj{2_B}$} (dots);
+\path (dots) edge [above] node {$\disj{{k-1}_B}$} (b_k);
+
+\path (b_1) [loop above] edge [right] node {} (b_1);
+\path (b_2) [loop above] edge [right] node {} (b_2);
+% \path (b_k) [loop above] edge [right] node {$\disj{b_k}$} (b_k);
+
+\path (b_1) edge [below, bend right=22] node {} (b_k);
+\path (b_2) edge [below, bend right=15] node [near start] {$\disj{{k}_B}$} (b_k);
+
+\end{tikzpicture}
+
+
+
+% \begin{tikzLTS}
+% \tikzstyle{state} = [circle,draw=black,thick,inner sep=1.5pt, text width={width("$\text{init}_2$")}, align=center]
+% \tikzstyle{boxLabel} = [yshift=-0.4cm]
+% \tikzstyle{every node} = [node distance=1.75cm]
+% 
+% \node[state] (t1) {$b_1$};
+% \node[state] (t2) [below of=t1] {$b_2$};
+% \node[] (t3) [below of=t2] {$$};
+% \node[] (t4) [below of=t3, node distance=1cm] {$$};
+% \node[state] (t5) [below of=t4] {$b_k$};
+% 
+% \path (t1) [post,loop right] edge node [right] (l1) {} (t1);
+% \path (t1) [post] edge node[right] {$\disj{b_1}$} (t2);
+% \path (t2) [post,loop right] edge node [right] (l2) {} (t2);
+% \path (t2) [post,dashed] edge node[right] {$\disj{b_2}$} (t3);
+% \path (t3) [dotted] edge (t4);
+% \path (t4) [post,dashed] edge node[right] {$\disj{b_{k-1}}$} (t5);
+% \path (t5) [post,loop right] edge node[right] (l5) {$\disj{b_k}$} (t5);
+% 
+% \node (U2) [draw=black, fit=(t1) (t2) (t3) (t4) (t5) (l1) (l2) (l5), inner sep=0.75cm] {} ;
+% \node [boxLabel] at (U2.north) {Template $B$};
+% 
+% \end{tikzLTS}

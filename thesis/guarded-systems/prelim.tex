@@ -1,0 +1,269 @@
+\section{Preliminaries} \label{gua:sec:prelim}\label{gua:sec:definitions}
+Many definitions intersect with those defined in previous chapters,
+but to keep the chapter self-contained we define them here.
+
+Notation:
+$\bbB = \{\true,\false\}$ is the set of Boolean values,
+$\bbN$ is the set of natural numbers (excluding $0$),
+$\bbN_0 = \bbN\cup\{0\}$,
+$[k]$ is the set $\{i \in \bbN \| i \leq k\}$
+and $[0..k]$ is the set $[k] \cup \{0\}$ for $k \in \bbN$.
+For a sequence $x=x_1x_2\ldots$ denote the $i$-$j$-subsequence as $x\slice{i}{j}$,
+i.e., ${x\slice{i}{j}}=x_i \ldots x_j$.
+
+
+\subsection{System Model} \label{gua:sec:model}
+
+We consider systems $A {\parallel} B^n$, usually written $\largesys$, 
+consisting of
+one copy of a process template $A$ and $n$ copies of a process template $B$,
+in an interleaving parallel composition.%
+%% AK: moved to a separate note, to be able to explain why we _cannot_ generalize for 1-conj
+%\footnote{As shown in \cite{Emerson00}, cutoffs for this case generalize to cutoffs 
+%          for systems of the form $A^m {\parallel} B^n$, and further 
+%          to systems with an arbitrary number of process templates 
+%          $U_1^{n_1} {\parallel} \ldots {\parallel} U_m^{n_m}$.} 
+We distinguish objects that belong to different templates by indexing them with
+the template. E.g., for process template $U \in \{A,B\}$, $Q_U$ is the set of
+states of $U$. For this section, fix two disjoint finite sets $Q_A$, $Q_B$ as
+sets of states of process templates $A$ and $B$, and a positive integer $n$.
+
+\parbf{Processes} A \emph{process template} 
+ is a transition system
+  $U=(\stateset, \init, \inputs, \delta)$ with 
+	\begin{itemize}
+	\item $\stateset$ is a finite set of states including the
+  initial state $\init$,
+	\item $\inputs$ is a finite input alphabet,
+	\item $\delta: \stateset \times \inputs \times \mP(Q_A \cupdot Q_B) \times \stateset$ is a guarded transition relation.
+	\end{itemize}
+A process template is \emph{closed} if $\inputs = \emptyset$, and otherwise \emph{open}.
+
+By $\transition{q_i}{q_j}{e:g}$
+we denote a process transition from $q_i$ to $q_j$
+for input $e \in \Sigma$ and guarded by guard $g \in \mP(Q_A \cupdot Q_B)$.
+We skip the input $e$ and guard $g$
+if they are not important or can be inferred from the context.
+
+We define the size $\card{U}$ of a process template $U \in \{A,B\}$ as $\card{\stateset_U}$. A copy of a template $U$ will be called a \emph{$U$-process}.
+Different $B$-processes are distinguished by subscript, i.e., for $i \in [1..n]$, $B_i$ is the $i$th copy of $B$, and $\state_{B_i}$ is a state of $B_i$. A state of the $A$-process is denoted by $q_A$. 
+
+For the rest of this subsection, fix templates $A$ and $B$. We assume that $\inputs_A \cap \inputs_B = \emptyset$. We will also write $p$ for a process in $\{ A, B_1, \ldots, B_n\}$, unless $p$ is specified explicitly.
+We often denote the set $\{B_1,...,B_n\}$ as $\mB$.
+
+
+\parbf{Disjunctive and conjunctive systems}
+In a system $\largesys$,
+consider the global state $s = (\state_A,\state_{B_1},\ldots,\state_{B_n})$ and
+global input $e=(\localin_A,\localin_{B_1},\ldots,\localin_{B_n})$.
+We write $s(p)$ for $q_p$, and $e(p)$ for $\sigma_p$.
+A local transition $(\state_p,\localin_p,g,\state_p') \in \delta_U$ of a process $p$ is \emph{enabled for $s$ and $e$}
+if the \emph{guard} $g$ is satisfied by the state $s$ wrt.\ the process $p$, written $(s,p) \models g$ (defined below).
+The semantics of $(s,p) \models g$ differs for disjunctive and conjunctive systems:
+%
+\begin{align*}
+\text{In disjunctive systems: } & (s,p) \models g \text{~~~iff~~~} 
+\exists p' \in \{A,B_1,\ldots,B_n\} \setminus \{p\}:\ \ \state_{p'} \in g. \\
+\text{In conjunctive systems: } & (s,p) \models g \text{~~~iff~~~} 
+\forall p' \in \{A,B_1,\ldots,B_n\} \setminus \{p\}:\ \ \state_{p'} \in g.
+\end{align*}
+
+Note that we check containment in the guard (disjunctively or conjunctively) 
+only for local states of processes \emph{different from} $p$. A process is \emph{enabled} for $s$ and $e$ if at least one of its transitions is enabled for $s$ and $e$, otherwise it is \emph{disabled}.
+
+Like Emerson and Kahlon~\cite{Emerson00}, 
+we assume that in conjunctive systems $\init_A$ and $\init_B$ are contained in all guards,
+i.e., they act as neutral states.
+Furthermore, we call a conjunctive system \emph{$1$-conjunctive} if every guard is of the form $(Q_A \cupdot Q_B) \setminus \{q\}$ for some $q \in Q_A\cupdot Q_B$.
+
+Then, \largesys is defined as the transition 
+system $(S,\init_S,\globIn,\delta)$ with 
+\begin{itemize}
+\item set of global states $S = \stateset_A \times \stateset_B^{n}$, 
+\item global initial state $\init_S = (\initstate_A,\initstate_B,\ldots,\initstate_B)$, 
+\item set of global inputs $\globIn = (\inputs_A) \times (\inputs_B)^{n}$,
+\item and global transition relation $\delta \subseteq S \times \globIn \times S$ with $(s,e,s') \in \delta$ iff 
+\begin{enumerate}[label=\roman*)] 
+  \item $s=(\state_A,\state_{B_1},\ldots,\state_{B_n})$, 
+  \item $e=(\localin_A, \localin_{B_1},\ldots,\localin_{B_n})$, and 
+  \item $s'$ is obtained from $s$ by replacing one local state $\state_p$ with a new local state $\state_p'$, where $p$ is a $U$-process with local transition $(\state_{p},\localin_{p},g,\state_p') \in \delta_U$ and $(s,p) \models g$. 
+        Thus, we consider so-called interleaved systems,
+        where in each step exactly one process transits.
+\end{enumerate}
+\end{itemize}
+We say that a system $\largesys$ is \emph{of type} $(A,B)$. It is called a
+\emph{conjunctive system} if guards are interpreted conjunctively, and a
+\emph{disjunctive system} if guards are interpreted disjunctively. 
+A system is \emph{closed} if all of its templates are closed.
+
+
+\parbf{Runs} 
+A \emph{configuration} of a system is a triple $(s,e,p)$, where $s \in S$, $e 
+\in \globIn$, and $p$ is either a system process, or the special symbol $\bot$.
+ A \emph{path} of a system is a configuration sequence 
+$x = (s_1,e_1,p_1),(s_2,e_2,p_2),\ldots$ such that, for all $\time < |x|$, there is a 
+transition $(s_\time,e_\time,s_{\time+1}) \in \delta$ based on a local 
+transition of process $p_\time$. We say that process 
+$p_\time$ \emph{moves} at \emph{moment} $\time$. 
+Configuration $(s,e,\bot)$ appears
+ iff all processes are disabled for $s$ and $e$.
+Also, for every $p$ and $\time < |x|$: 
+either $e_{\time+1}(p) = e_\time(p)$ or process $p$ moves at moment $\time$. 
+That is, the environment keeps the input to each process unchanged until 
+the process can read it.\footnote{By only considering inputs that are actually processed, we 
+approximate an 
+action-based semantics. Paths that do not fulfill this requirement are not 
+very interesting, since the environment can violate any interesting 
+specification that involves input signals by manipulating them when the 
+corresponding process is not allowed to move.} 
+
+A system \emph{run} is a maximal path starting in the initial state. Runs are either infinite, or they end in a configuration $(s,e,\bot)$. We say that a run is \emph{initializing} if every 
+%$B$-process 
+process
+that moves infinitely often also visits 
+%$\initstate_B$ 
+its $\initstate$ 
+infinitely often.
+
+Given a system path $x = (s_1,e_1,p_1),(s_2,e_2,p_2),\ldots$ and a process $p$, the \emph{local path} of $p$ in $x$ is the projection $x(p) = (s_1(p),e_1(p)),(s_2(p),e_2(p)),\ldots$ of $x$ onto local states and inputs of $p$.
+Similarly, we define the projection on two processes $p_1,p_2$ denoted by $x(p_1,p_2)$.
+
+%The \emph{destuttering} $\destutter(x)$\ak{make it work with inf runs} of a (local) path \sj{local path not defined} $x=x_0,x_1,\ldots$ is obtained by removing stuttering steps from the sequence, i.e., $\destutter(x)$ is the maximal subsequence $x'$ of $x$ such that for every $\time$ we have $x'_\time \neq x'_{\time+1}$. Two (local) paths $x$ and $y$ are \emph{stutter-equivalent}, written $x \simeq y$, if $\destutter(x)=\destutter(y)$. Define an extension of $\destutter$ to sets of paths in the obvious way. Then two systems $S_1, S_2$ are \emph{stutter-equivalent}, written $S_1 \simeq S_2$, if $\destutter(X_1) = \destutter(X_2)$, where $X_i$ is the set of all infinite runs of system $S_i$.
+
+\parbf{Deadlocks and fairness}
+A run is \emph{globally deadlocked} if it is finite.
+An infinite run is \emph{locally deadlocked} for process $p$ if there exists $\time$ such that $p$ is disabled for all $s_{\time'},e_{\time'}$ with $\time'\ge \time$. A run is \emph{deadlocked} if it is locally or globally deadlocked.
+A system \emph{has a (local/global) deadlock} if it has a (locally/globally) deadlocked run. Note that the absence of local deadlocks for all $p$ implies the absence of global deadlocks, but not the other way around.
+
+A run $(s_1,e_1,p_1), (s_2,e_2,p_2),...$ is \emph{unconditionally-fair} if every process moves infinitely often. 
+A run is \emph{strong-fair} if it is infinite and, for every process $p$, if $p$ is enabled infinitely often, then $p$ moves infinitely often.
+%\sj{weak fairness needed?} Finally, $x$ is \emph{weak-fair} if it is infinite and for every process $p$, if there exists $t$ such that $p$ is enabled for every $s_{\time'}, e_{\time'}$ with $\time' \ge \time$, then $p$ moves infinitely often.
+We will discuss the role of deadlocks and fairness in synthesis in Section~\ref{gua:sec:paramsynt}.
+
+\begin{remark}[$A^m {\parallel} B^n$]
+One usually starts with studying parameterized systems of the form $A^n$ (having one process template),
+then proceeds to systems of the form $A^m {\parallel} B^n$ (having two templates)
+and $U_1^{n_1} {\parallel} \ldots {\parallel} U_m^{n_m}$ (having an arbitrary fixed number of templates).
+Our work studies systems $A {\parallel} B^n$,
+which have one $A$-process and a parameterized number of $B$-processes,
+because the results for such systems can be generalized to systems $U_1^{n_1} {\parallel} \ldots {\parallel} U_m^{n_m}$
+(see~\cite{Emerson00} for details).
+This generalization works for our results as well,
+except for the cutoffs for deadlock detection that are restricted to 1-conjunctive systems of the form $A\parallel B^n$
+(Section~\ref{gua:sec:cutoffs}).
+\end{remark}
+
+\subsection{Specifications}
+\label{gua:sec:semantics}
+Fix templates $(A,B)$.
+We consider formulas in $\LTLmX$---$\LTL$ without the next-time operator $\nextt$---%
+that are prefixed by path quantifiers $\E$ or $\A$
+(for LTL and path quantifiers see Section~\ref{defs:ctlstar}).
+Let $h(A,B_{i_1},\ldots,B_{i_k})$ be an $\LTLmX$ formula over atomic propositions from $Q_A \cup \Sigma_A$ and indexed propositions from $(Q_B \cup \Sigma_B) \times \{i_1,\ldots,i_k\}$.
+For a system $\largesys$ with $n \geq k$ and every $i_j \in [1..n]$,
+satisfaction of $\A h(A,B_{i_1},\ldots,B_{i_k})$ and $\E h(A,B_{i_1},\ldots,B_{i_k})$ is defined in the usual way.
+
+
+\parbf{Parameterized specifications} \label{gua:sec:parameterized}
+A \emph{parameterized specification} is a temporal logic formula
+with indexed atomic propositions and quantification over indices. 
+We consider formulas of the forms
+$\forall{i_1,\ldots,i_k.} \A h(A,B_{i_1},\ldots,B_{i_k})$ and\\ 
+$\forall{i_1,\ldots,i_k.} \E h(A,B_{i_1},\ldots,B_{i_k})$. 
+For a given $n \geq k$, 
+$$
+\largesys \models \forall{i_1,{\ldots},i_k.} \A h(A,B_{i_1},{\ldots},B_{i_k})
+$$
+~iff~
+$$
+\largesys \models \!\!\!\!\!\!\!\!\bigwedge_{j_1 \neq {\ldots} \neq j_k \in [1..n]}\!\!\!\!\!\!\!\!\A h(A,B_{j_1},{\ldots},B_{j_k}).
+$$ 
+By symmetry of guarded systems (see~\cite{Emerson00}),
+the second formula is equivalent to
+$\largesys \models \A h(A,B_1,\ldots,B_k)$. 
+The formula $\A h(A,B_1,\ldots,B_k)$ is denoted by $\A h(A,B^{(k)})$, 
+and we often use it instead of the original $\forall{i_1,\ldots,i_k.} \A h(A,B_{i_1},...,B_{i_k})$.
+For formulas with the path quantifier $\E$,
+satisfaction is defined analogously
+and is equivalent to satisfaction of $\E h(A,B^{(k)})$.
+\begin{example}
+Consider the formula
+$$
+\forall{i_1,i_2}.\A \big(\G (r_{i_1} \impl \F g_{i_1}) \land \G \neg (g_{i_1} \land g_{i_2})\big).
+$$
+By our definition, its satisfaction by a system $(A,B)^{(1,3)}$ means
+\begin{align*}
+(A,B)^{(1,3)} \models
+\A \left(
+\begin{aligned}
+&\G(r_1 \impl \F g_1) \land \G(r_2 \impl \F g_2) \land \G(r_3 \impl \F g_3) \land \\
+&\G \neg (g_1 \land g_2) \land \G \neg (g_1 \land g_3) \land \G \neg (g_2 \land g_3)
+\end{aligned}
+\right),
+\end{align*}
+where $g_1$ and $r_1$ refer to the propositions $g$ and $r$ of the process $B_1$,
+$g_2$ and $r_2$ belong to $B_2$, and so on.
+By symmetry, the latter satisfaction is equivalent to
+\begin{align*}
+(A,B)^{(1,3)} \models
+\A \left(
+\begin{aligned}
+&\G(r_1 \impl \F g_1) \land \G(r_2 \impl \F g_2) \land \\
+&\G \neg (g_1 \land g_2)
+\end{aligned}
+\right).
+\end{align*}
+Note that this formula talks about processes $B_1$ and $B_2$, but does not mention $B_3$.
+\end{example}
+
+
+\parbf{Specification of fairness and local deadlocks}
+It is often convenient to express fairness assumptions and local deadlocks 
+as parameterized specifications.
+To this end,
+define auxiliary atomic propositions $\sched_p$ and $\enabled_p$ for every process $p$ of system $(A,B)^{(1,n)}$. At moment $\time$ of a given run $(s_1,e_1,p_1),(s_2,e_2,p_2), \ldots$, let $\sched_p$ be true whenever $p_\time = p$, and let $\enabled_p$ be true if $p$ is enabled for $s_\time, e_\time$. Note that we only allow the use of these propositions to define fairness, but not in general specifications.
+Then, an infinite run is 
+\begin{itemize}
+\item \emph{local-deadlock-free} if it satisfies $\forall{p}. \GF \enabled_p$, abbreviated as $\spec_{\neg dead}$,
+\item \emph{strong-fair} if it satisfies $\forall{p}. \GF \enabled_p \impl \GF \sched_p$, abbreviated as $\spec_{strong}$, and 
+\item \emph{unconditionally-fair} if it satisfies $\forall{p}. \GF \sched_p$, abbreviated as $\spec_{uncond}$.
+%\item \sj{needed?:}\emph{weak-fair} if it satisfies $\forall{p}. \A \spec_{weak}$, where $\spec_{weak} = \FG \enabled_p \impl \GF \sched_p$.
+\end{itemize}
+
+If $f \in \{strong, uncond\}$ is a fairness notion and 
+$\A h(A,B^{(k)})$
+a specification, then we write
+$\A_{f} h(A,B^{(k)})$ for $\A (\spec_{f} 
+\rightarrow h(A,B^{(k)}))$.
+Similarly, we write $\E_{f} h(A,B^{(k)})$ for $\E (\spec_{f} \land h(A,B^{(k)}))$.
+
+
+
+\subsection{Model Checking and Synthesis Problems}
+\label{gua:sec:nonparameterized_synthesis}
+%
+Given a system $\largesys$ and a specification $\A h(A,B^{(k)})$, where $n \ge k$. Then:
+\begin{itemize}
+\item the \emph{model checking problem} is to decide whether $\largesys \models \A h(A,B^{(k)})$,
+\item the \emph{deadlock detection problem} is to decide whether $\largesys$
+      does not have global nor local deadlocks,
+%\item the \emph{deadlock detection problem} is to decide whether all runs of $\largesys$
+%are infinite and $\largesys \models \A \spec_{\neg dead}$, 
+%i.e., there are no local deadlocks,
+\item the \emph{parameterized model checking problem} (PMCP) is to decide whether $\forall m \ge n:\ (A,B)^{(1,m)} \models \A h(A,B^{(k)})$, and 
+%\item the \emph{parameterized deadlock detection problem} is to decide whether for all $m \ge n$, all runs of $(A,B)^{(1,m)}$ are infinite and $(A,B)^{(1,m)} \models \A \spec_{\neg dead}$.
+\item the \emph{parameterized deadlock detection problem} is to decide whether, 
+      for all $m \ge n$, $(A,B)^{(1,m)}$ does not have global nor local deadlocks.
+\end{itemize}
+For a given number $n \in \bbN$ and specification $\A h(A,B^{(k)})$ with $n \ge k$,
+\begin{itemize}
+\item the \emph{template synthesis problem} is to find process templates $A,B$ such that
+$\largesys \models \A h(A,B^{(k)})$ and $\largesys$ does not have global deadlocks\footnote{\label{footnote:local-deadlocks}Here we do not explicitly mention local deadlocks because they can be specified as a part of $\A h(A,B^{(k)})$.}
+\item 
+the \emph{bounded template synthesis problem} for a pair of bounds $(\bound_A,\bound_B) \in \bbN \times \bbN$ 
+is to solve the template synthesis problem with
+$\card{A} \leq \bound_A$ and $\card{B} \leq \bound_B$.
+\item the \emph{parameterized template synthesis problem} is to find process templates $A,B$ such that $\forall m \ge n:\ (A,B)^{(1,m)} \models \A h(A,B^{(k)})$ and $(A,B)^{(1,m)}$ does not have global deadlocks\footnoteref{footnote:local-deadlocks}.
+\end{itemize}
+Similarly, we define problems for specifications having $\E$ instead of $\A$.
+The definitions can be flavored with different notions of fairness.

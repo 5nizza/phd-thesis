@@ -1,0 +1,55 @@
+%
+% This temporal.sty' version 1.4, May 2003
+%
+% Purpose: define commands for the formatting of temporal logic formulae.
+%
+% Authors: Roderick Bloem and Fabio Somenzi
+%
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{temporal}[2003/05/12 v1.4 Temporal logic operators]
+
+\DeclareMathOperator{\EB}{\mathsf{EB}}
+\DeclareMathOperator{\EX}{\mathsf{EX}}
+\DeclareMathOperator{\EY}{\mathsf{EY}}
+\DeclareMathOperator{\EU}{\mathsf{EU}}
+\DeclareMathOperator{\ER}{\mathsf{ER}}
+\DeclareMathOperator{\ES}{\mathsf{ES}}
+\DeclareMathOperator{\EG}{\mathsf{EG}}
+\DeclareMathOperator{\EH}{\mathsf{EH}}
+\DeclareMathOperator{\EF}{\mathsf{EF}}
+\DeclareMathOperator{\EFX}{\mathsf{EFX}}
+\DeclareMathOperator{\EP}{\mathsf{EP}}
+\DeclareMathOperator{\AX}{\mathsf{AX}}
+\DeclareMathOperator{\AY}{\mathsf{AY}}
+\DeclareMathOperator{\AU}{\mathsf{AU}}
+\DeclareMathOperator{\AR}{\mathsf{AR}}
+\DeclareMathOperator{\AG}{\mathsf{AG}}
+\DeclareMathOperator{\AGF}{\mathsf{AGF}}
+\DeclareMathOperator{\AGEF}{\mathsf{AGEF}}
+\DeclareMathOperator{\AFAG}{\mathsf{AFAG}}
+\DeclareMathOperator{\AFG}{\mathsf{AFG}}
+\DeclareMathOperator{\EFG}{\mathsf{EFG}}
+\DeclareMathOperator{\AF}{\mathsf{AF}}
+\DeclareMathOperator{\pexists}{\mathsf{E}}
+\DeclareMathOperator{\pforall}{\mathsf{A}}
+\DeclareMathOperator{\nextt}{\mathsf{X}}
+\DeclareMathOperator{\yesterday}{\mathsf{Y}}
+\newcommand{\until}{\mathbin{\mathsf{U}}}
+\newcommand{\weakuntil}{\mathbin{\mathsf{W}}}
+\newcommand{\since}{\mathbin{\mathsf{S}}}
+\newcommand{\releases}{\mathbin{\mathsf{R}}}
+\DeclareMathOperator{\always}{\mathsf{G}}
+\DeclareMathOperator{\hitherto}{\mathsf{H}}
+\DeclareMathOperator{\eventually}{\mathsf{F}}
+\DeclareMathOperator{\previously}{\mathsf{P}}
+\newcommand{\true}{\mathsf{true}}
+\newcommand{\false}{\mathsf{false}}
+\newcommand{\fair}{\mathsf{fair}}
+% The following command encloses its argument in square brackets with
+% double vertical bars.  It can be used in both math and paragraph modes.
+\newcommand{\sqsq}[1]{\ensuremath{[\negthinspace[#1]\negthinspace]}}
+% The following command takes care of proper spacing around the dots used
+% to delimit the scope of quantifiers, lambdas, etc..
+\DeclareMathOperator{\scope}{\mathbin{.}}
+
+\endinput

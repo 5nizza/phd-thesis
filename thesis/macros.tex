@@ -1,0 +1,339 @@
+\makeatletter
+\if@titlepage
+  \newenvironment{abstract}{%
+      \titlepage
+      \null\vfil
+      \@beginparpenalty\@lowpenalty
+      \begin{center}%
+        \bfseries \abstractname
+        \@endparpenalty\@M
+      \end{center}}%
+     {\par\vfil\null\endtitlepage}
+\else
+  \newenvironment{abstract}{%
+      \if@twocolumn
+        \section*{\abstractname}%
+      \else
+        \small
+        \begin{center}%
+          {\bfseries \abstractname\vspace{-.5em}\vspace{\z@}}%
+        \end{center}%
+        \quotation
+      \fi}
+      {\if@twocolumn\else\endquotation\fi}
+\fi
+\makeatother
+
+
+
+\usepackage{acronym}
+\usepackage{booktabs}
+\usepackage{pdflscape}
+\usepackage{epigraph}
+
+\let\proof\relax
+\let\endproof\relax
+
+\usepackage{amsthm}
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{temporal}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{xspace}
+\usepackage{subcaption}
+\usepackage{stmaryrd} % for short arrows
+%\usepackage{parskip}  % don't indent paragraphs -- use vertical spacing instead
+\usepackage[svgnames]{xcolor}  % used by preamble
+\usepackage{multirow}
+\usepackage{doi}   % to allow _ in doins
+\usepackage{tikz}\usetikzlibrary{arrows,automata,calc,fit,positioning}
+\usepackage{wrapfig}
+\usepackage{booktabs}  % better tables
+\usepackage{colortbl}
+\usepackage{float}  % for forcing position with 'H' (like \begin{table}[H])
+\usepackage{environ}  % Guarded Systems use \NewEnv to create new env for tikz pics
+\usepackage{enumitem}  % Guarded Systems
+\usepackage{mdframed}
+\usepackage{wasysym}
+\usepackage{pifont}
+
+\usepackage{thmtools, thm-restate}
+
+% for appendix at the end of the chapter
+% + some tricks for TOC
+% https://tex.stackexchange.com/questions/120716/appendix-after-each-chapter
+\usepackage{appendix}
+\usepackage{chngcntr}
+\usepackage{etoolbox}
+\AtBeginEnvironment{subappendices}{%
+\chapter*{Appendix}
+\addcontentsline{toc}{chapter}{~~~~Appendix}
+\counterwithin{figure}{section}
+\counterwithin{table}{section}
+}
+
+%%%%%%%%%%%%%% trackchanges %%%%%%%%%%%%%%
+% ignore llncs note command
+\let\note\relax
+\let\endnote\relax
+
+\iffinal
+  \usepackage[finalold]{trackchanges} % also use \sr,\sj,\ak,\ba
+\else
+  \usepackage[inline]{trackchanges}
+\fi
+
+\addeditor{$A\!K$}
+\addeditor{$R\!B$}
+\addeditor{$S\!J$}
+\newcommand{\ak}[1]{\note[$A\!K$]{#1}}
+\newcommand{\rb}[1]{\note[$R\!B$]{#1}}
+\newcommand{\sj}[1]{\note[$S\!J$]{#1}}
+%% end of trackchanges
+
+\usepackage{hyperref}   % goes last
+\hypersetup{
+    colorlinks,
+    linkcolor=black,
+    citecolor=black,
+}
+
+\makeatletter
+\newcommand\footnoteref[1]{\protected@xdef\@thefnmark{\ref{#1}}\@footnotemark}
+\makeatother
+
+%---------------------------------------------------------------------
+%---------------------------------------------------------------------
+%---------------------------------------------------------------------
+%---------------------------------------------------------------------
+%---------------------------------------------------------------------
+%---------------------------------------------------------------------
+
+
+\newcommand{\mailto}[1]{\href{mailto:#1}{\nolinkurl{#1}}}
+\newcommand{\ack}[1]{\smallskip\noindent\small{\textbf{Acknowledgements.} #1}}
+
+
+\newcommand\abstractname{Abstract}
+%\newtheorem{obs}{Observation}
+%\declaretheorem[name=Theorem]{thm}
+%\declaretheorem[name=Lemma]{lem}
+%\declaretheorem[name=Corollary]{cor}
+%\declaretheorem[name=Observation]{obs}
+%\declaretheorem[name=Claim]{claim}
+
+% BEGIN theorems
+\newtheoremstyle{myexample}% name
+  {5pt}%      Space above
+  {5pt}%      Space below
+  {}%         Body font
+  {}%         Indent amount (empty = no indent, \parindent = para indent)
+  {\itshape}% Thm head font
+  {.}%        Punctuation after thm head
+  {.5em}%     Space after thm head: " " = normal interword space;
+        %       \newline = linebreak
+  {}%         Thm head spec (can be left empty, meaning `normal')
+{\theoremstyle{myexample} \newtheorem{example}{Example} }
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+{\theoremstyle{definition} \newtheorem{remark}{Remark} }
+%\newenvironment{proof}{\begin{IEEEproof}}{\end{IEEEproof}}
+%\newcommand{\qed}{}
+
+
+
+%paragraph with some skip and bold heading
+\newcommand{\parbf}[1]{\smallskip\noindent {\bf #1.}}
+\newcommand{\parit}[1]{\smallskip\noindent {\it #1.}}
+
+\newcommand{\bbN}{\mathbb{N}}
+\newcommand{\bbB}{\mathbb{B}}
+\newcommand{\bbR}{\mathbb{R}}
+\newcommand{\bigdotcup}{\ensuremath{\mathaccent\cdot{\bigcup}}}
+
+\newcommand\LTL{\ensuremath{\text{LTL}}\xspace}
+\newcommand\LTLmX{\ensuremath{\text{LTL}\backslash\text{X}}}
+\newcommand\CTLstar{\ensuremath{{\text{CTL}^*}}\xspace}
+\newcommand\CTLstarmX{\ensuremath{{\text{CTL}^*\backslash\text{X}}}\xspace}
+\newcommand\CTL{\ensuremath{\text{CTL}}\xspace}
+
+\definecolor{lightgray}{gray}{0.8}
+\definecolor{darkgreen}{rgb}{0,0.5,0}
+\definecolor{darkblue}{rgb}{0,0,.5}
+\definecolor{darkred}{rgb}{0.9,0,0}
+\definecolor{pink}{rgb}{0.95,0.08,0.55}
+\definecolor{mygray}{gray}{.6}
+\newcommand{\minor}[1]{{\footnotesize\textcolor{mygray}{#1}}}
+%% end of trackchanges
+
+
+%% 'such that'
+\renewcommand{\|}{\mid}
+%% disjoint union
+\newcommand{\cupdot}{\mathbin{\dot{\cup}}}
+
+
+%% specification, implication
+\renewcommand{\iff}{\leftrightarrow}
+\newcommand{\Iff}{\Leftrightarrow}
+\newcommand{\impl}{\rightarrow}
+\newcommand{\Impl}{\Rightarrow}
+\newcommand{\Implied}{\Leftarrow}
+
+% add line breaks to table cells, to labels of tikz 
+% usage: \specialcellC{first line \\ second line} 
+\newcommand{\specialcellC}[2][c]{%
+  \begin{tabular}[#1]{@{}c@{}}#2\end{tabular}}
+\newcommand{\specialcellL}[2][c]{%
+  \begin{tabular}[#1]{@{}l@{}}#2\end{tabular}}
+
+% temporal logic
+\newcommand\G\always\xspace
+\newcommand\F\eventually\xspace
+\newcommand\W\weakuntil\xspace
+\newcommand\U\until\xspace
+\newcommand\R\releases\xspace
+\newcommand\X\nextt\xspace
+\newcommand\XX{\ensuremath{\nextt\!\nextt\xspace}}
+\newcommand\XXX{\ensuremath{\nextt\!\nextt\!\nextt\xspace}}
+\newcommand{\GF}{\G\!\F\xspace}
+\newcommand{\FG}{\F\!\G\xspace}
+\newcommand\E{{\ensuremath\pexists}\xspace}
+\newcommand\A{{\ensuremath\pforall}\xspace}
+
+
+% Latex syntax sugar
+\newcommand\li{\begin{itemize}}
+\newcommand\il{\end{itemize}}
+\renewcommand{\-}{\item}
+%\newcommand\lo{\begin{enumerate}}
+%\newcommand\ol{\end{enumerate}}
+
+\newcommand\todo[1]{\ak{\hl{todo: #1}}}
+
+% ttfamily with bold. Use in lstslistings: 
+% \begin{lstlisting}[basicstyle=\ttfamilywithbold,language=python,mathescape]
+%   the code here will have bold
+% \end{lstlisting}
+% http://tex.stackexchange.com/questions/25249/how-do-i-use-a-particular-font-for-a-small-section-of-text-in-my-document/25251#25251
+%\newcommand*{\ttfamilywithbold}{\fontfamily{lmtt}\selectfont}
+
+\newcommand{\current}{\sethlcolor{green}\ \hl{current} \ \sethlcolor{yellow}}
+
+\newcommand{\tpl}[1]{\left<#1\right>}
+
+\newcommand{\edge}[3]{#1 \stackrel{{#2}}{\rightarrow} #3}
+\newcommand{\trans}[1]{\stackrel{{#1}}{\rightarrow}}
+\newcommand{\eqbydef}{\triangleq}
+
+\newcommand{\I}{{2^I}}
+\renewcommand{\O}{{2^O}}
+\newcommand{\reach}{\mathit{rch}}
+\newcommand{\rank}{\rho}
+\newcommand{\RANK}{\ensuremath{R_\triangleright}\xspace}
+
+% types of properties
+\newcommand{\buchi}{B\"{u}chi\xspace}
+\newcommand{\AUBW}{\ensuremath{\A(\textit{UBW})}\xspace}
+\newcommand{\AUCW}{\ensuremath{\A(\textit{UCW})}\xspace}
+\newcommand{\AUSW}{\ensuremath{\A(\textit{USW})}\xspace}
+\newcommand{\AURW}{\ensuremath{\A(\textit{URW})}\xspace}
+\newcommand{\AUXW}{\ensuremath{\A(\textit{UXW})}\xspace}
+
+\newcommand{\ENBW}{\ensuremath{\E(\textit{NBW})}\xspace}
+\newcommand{\NBW}{\ensuremath{\textit{NBW}}\xspace}
+\newcommand{\AHT}{\ensuremath{\textit{AHT}}\xspace}
+\newcommand{\ENCW}{\ensuremath{\E(\textit{NCW})}\xspace}
+\newcommand{\ENSW}{\ensuremath{\E(\textit{NSW})}\xspace}
+\newcommand{\EDSW}{\ensuremath{\E(\textit{DSW})}\xspace}
+\newcommand{\ADSW}{\ensuremath{\A(\textit{DSW})}\xspace}
+\newcommand{\EDRW}{\ensuremath{\E(\textit{DRW})}\xspace}
+\newcommand{\EDFW}{\ensuremath{\E(\textit{DFW})}\xspace}
+\newcommand{\EDBW}{\ensuremath{\E(\textit{DBW})}\xspace}
+\newcommand{\ENRW}{\ensuremath{\E(\textit{NRW})}\xspace}
+\newcommand{\ENXW}{\ensuremath{\E(\textit{NXW})}\xspace}
+
+% other math macros
+\newcommand{\out}{\mathit{out}}
+\newcommand{\GR}{\triangleright}
+\newcommand{\PhiE}{\Phi^{\GR}_\E}
+\newcommand{\PhiA}{\Phi^{\GR}_\A}
+
+\newcommand{\Inf}{\textit{Inf}}
+\newcommand{\Fin}{\textit{Fin}}
+\newcommand{\Pref}{\textit{Pref}}
+
+\renewcommand{\true}{\textsf{true}\xspace}
+\renewcommand{\false}{\textsf{false}\xspace}
+
+
+% medium sized versions of operators
+\DeclareMathOperator*{\medoplus}{\text{\raisebox{0.25ex}{\scalebox{0.8}{$\bigoplus$}}}}
+\DeclareMathOperator*{\medvee}{\text{\raisebox{0.25ex}{\scalebox{0.8}{$\bigvee$}}}}
+\DeclareMathOperator*{\medwedge}{\text{\raisebox{0.25ex}{\scalebox{0.8}{$\bigwedge$}}}}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% preamble used for pictures by tikzit
+% I don't know how to import the preamble though:
+% of course, you can just copy-paste it into the custom preamble,
+% but the default preamble should also be changed so that tikzit can correctly display it
+%    but tikzit does not allow to modify the default preamble nor to import it...
+
+%\usepackage[svgnames]{xcolor}
+\usepackage{tikz}
+\usetikzlibrary{arrows,automata}
+\usetikzlibrary{decorations.markings}
+\usetikzlibrary{shapes.geometric}
+
+% for some reason,
+% in this book class all fonts are larger than in the non-book version,
+% so let's set font=\small
+\tikzset{every picture/.style={/utils/exec={\small}}}  
+
+\pgfdeclarelayer{edgelayer}
+\pgfdeclarelayer{nodelayer}
+\pgfsetlayers{edgelayer,nodelayer,main}
+
+\tikzstyle{none}=[inner sep=0pt]
+\tikzset{initial text={}}
+
+\tikzstyle{rn}=[circle,fill=White,draw=Red,minimum size=0.4cm,inner sep=0pt]
+\tikzstyle{gn}=[circle,fill=White,draw=Green,minimum size=0.4cm,inner sep=0pt]
+\tikzstyle{yn}=[circle,fill=White,draw=Yellow,minimum size=0.4cm,inner sep=0pt]
+\tikzstyle{wn}=[circle,fill=White,draw=Black,minimum size=0.4cm,inner sep=0pt]
+\tikzstyle{invisible}=[circle,fill=White,draw=White,inner sep=0pt]
+\tikzstyle{textual}=[rectangle]
+\tikzstyle{dot}=[circle,fill=Black,draw=Black,inner sep=0pt,minimum size=0.5mm]
+\tikzstyle{uptriangle}=[regular polygon,regular polygon sides=3,shape border rotate=0,fill=Black,draw=Black,inner sep=0pt,minimum size=1mm]
+\tikzstyle{text ellipse}=[rectangle,rounded corners,fill=White,draw=Black,minimum size=0.6cm,inner sep=0pt]
+
+
+
+\tikzstyle{simple}=[-,draw=Black]
+\tikzstyle{arrow}=[->,draw=Black]
+\tikzstyle{dashed arrow}=[->,draw=Black,dashed]
+\tikzstyle{tick}=[-,draw=Black,postaction={decorate},decoration={markings,mark=at position .5 with {\draw (0,-0.1) -- (0,0.1);}}]
+\tikzstyle{ga}=[->,draw=Green]
+\tikzstyle{pa}=[->,draw=DeepPink]
+\tikzstyle{red}=[-,draw=Red]
+\tikzstyle{pink}=[-,draw=DeepPink]
+\tikzstyle{blue}=[-,draw=Blue]
+\tikzstyle{green}=[-,draw=Green]
+\tikzstyle{yellow}=[-,draw=DarkGoldenrod]
+
+
+
+
+
+
+
+
+
+
+%%%% end of tikzit preamble
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -1,0 +1,22 @@
+\begin{tikzpicture}
+	\begin{pgfonlayer}{nodelayer}
+		\node [style=wn, initial below] (0) at (0, -0) {$\bar g$};
+		\node [style=wn] (1) at (2, -0) {$g$};
+		\node [style=textual] (2) at (-1, -0) {$\color{black}{_{q_0 \mapsto (q_1,r)}}$};
+		\node [style=textual] (3) at (-1, -0.25) {$_{q_0' \mapsto (q_0',r)}$};
+		\node [style=textual] (4) at (3, -0) {$\color{black}{_{q_0 \mapsto (q_1,r)}}$};
+		\node [style=textual] (5) at (3, -0.25) {$_{q_0' \mapsto (q_0',r)}$};
+		\node [style=textual] (6) at (-1, 0.25) {$\color{black}{_{q_3 \mapsto (q_4,\bar r)}}$};
+		\node [style=textual] (7) at (3, 0.25) {$\color{black}{_{q_1 \mapsto (q_2,r)}}$};
+		\node [style=textual] (8) at (3, 0.5) {$\color{black}{_{q_2 \mapsto (q_3,\bar r)}}$};
+		\node [style=textual] (9) at (-1, 0.5) {$\color{black}{_{q_4 \mapsto (q_4,\bar r)}}$};
+		\node [style=textual] (10) at (3, -0.5) {$_{p_{\sf EX}}$};
+		\node [style=textual] (11) at (-1, -0.5) {$_{p_{\sf EX}, p_{\sf EG}}$};
+	\end{pgfonlayer}
+	\begin{pgfonlayer}{edgelayer}
+		\draw [style=arrow, bend right=15, looseness=1.00] (0) to node[below]{$r$} (1);
+		\draw [style=arrow, bend right=15, looseness=1.00] (1) to node[above]{$\bar r$} (0);
+		\draw [style=arrow, in=120, out=60, loop] (0) to node[below]{$\bar r$} ();
+		\draw [style=arrow, in=120, out=60, loop] (1) to node[below]{$r$} ();
+	\end{pgfonlayer}
+\end{tikzpicture}

@@ -1,0 +1,32 @@
+% !TEX root = table.tex
+\begin{tikzpicture}[->,>=latex,
+node distance = 1cm,
+% minimum size = 5mm,
+% inner sep=1mm,
+bend angle=45]
+
+\tikzset{every state/.style={minimum size=0.8cm, inner sep=1mm}}
+
+\tikzset{every state/.append style={font=\Large}}
+\tikzset{every label/.append style={font=\Large}}
+
+
+\node[state,fill=red] (x) {$x$};
+\node[state,fill=green] (x') [right= of x] {$x'$};
+\node[inner sep=0mm,ellipse,draw,fit=(x) (x'), label=60:{$r_1$}] {};
+\node (invisible) [left=1cm of x]{};
+
+\path (invisible) edge (x);
+\path (x) edge (x');
+
+\node[state] (y) [right=3cm of x'] {$y$};
+\node[state] (y') [right= of y] {$y'$};
+\node[inner sep=0mm,ellipse,draw,fit=(y) (y'), label=60:{$r_2$}] {};
+\node (invisible2) [right=1cm of y']{};
+
+\path (x') edge (y);
+\path (y) edge (y');
+\path (y') edge (invisible2);
+
+\end{tikzpicture}
+

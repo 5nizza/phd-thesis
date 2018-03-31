@@ -1,0 +1,877 @@
+\section{Proof Techniques for Disjunctive Systems} \label{gua:sec:proofs-disj}
+
+\subsection{\LTLmX\ Properties without Fairness: Existing Constructions}
+\label{gua:sec:ideas-disj-nofair}
+
+We revisit the main techniques
+of the original proof of Theorem~\ref{thm:disj-cutoff-pairs}~\cite{Emerson00}. 
+
+\begin{lemma}[Monotonicity: Disj, \LTLmX, Unfair] \label{disj:le:NonFairDisjunctiveMono}
+    For disjunctive systems:
+    \begin{align*}
+    &\forall n \geq 1:\\
+    &(A,B)^{(1,n)} \models \pexists h(A,B_1)
+    \ \Impl \
+    (A,B)^{(1,n+1)} \models \pexists h(A,B_1).
+    \end{align*}
+\end{lemma}
+\begin{proof}
+Given a run $x$ of $(A,B)^{(1,n)}$,
+we construct a run $y$ of $(A,B)^{(1,n+1)}$: 
+copy $x$ into $y$ and keep the additional process in the initial state.
+\end{proof}
+
+
+As for the bounding lemma, we construct an infinite run $y$ of $\cutoffsys$ 
+with $y \models h(A,B^{(1)})$, 
+based on an infinite run $x$ of $\largesys$ with $n>c$ and $x \models h(A,B^{(1)})$. 
+The idea is to copy local runs $x(A)$ and $x(B_1)$ into $y$, 
+and construct runs of other processes in a way 
+that enables all transitions along $x(A)$ and $x(B_1)$. 
+The latter is achieved with the flooding construction.
+
+\myparagraph{Flooding construction \cite{Emerson00}}
+Given a run $x = (s_1,e_1,p_1), (s_2,e_2,p_2) \ldots$ of $\largesys$, let
+$\visited_\mB(x)$ be the set of all local states visited by $B$-processes in $x$,
+i.e., $\visited_\mB(x) = \{ q \in Q_B \| \exists m \exists i.\ s_m(B_i) = q \}$. 
+
+For every $q \in \visited_\mB(x)$ there is a local run of \largesys, say $x(B_i)$,
+that visits $q$ first, say at moment $m_q$. Then, saying that process 
+$B_{i_q}$ of \cutoffsys \emph{floods $q$} means:
+$$y(B_{i_q}) = x(B_i)\slice{1}{m_q}(q)^\omega.$$ 
+In words: the run $y(B_{i_q})$ is the same as $x(B_i)$ until moment $\time_q$,
+and after that the process never moves.
+
+The construction achieves the following. 
+If we copy local runs of $A$ and $B_1$ from $x$ to $y$, 
+and in $y$ for every $q \in \visited_\mB(x)$ introduce one process that floods $q$, 
+then: 
+if in $x$ at some moment $\time$ there is a process in state $q'$, 
+then in $y$ at moment $\time$ there will also be a process (different from 
+$A$ and $B_1$) in state $q'$. Thus, every transition of $A$
+ and $B_1$, which is enabled at moment $\time$ in $x$, will also be enabled in $y$. 
+
+\begin{lemma}[Bounding: Disj, \LTLmX, Unfair] \label{disj:le:NonFairDisjunctiveBounding}
+    For disjunctive systems:
+    \begin{align*}
+    \forall n \geq |B|+2:\ 
+    (A,B)^{(1,|B|+2)} \models \pexists h(A,B_1)
+    \ \ \Implied \ \ 
+    \largesys \models \pexists h(A,B_1).
+    \end{align*}
+\end{lemma}
+
+The proof of the lemma is from \cite[Lemma 4.1.2]{Emerson00}. 
+We recapitulate it to introduce the notions of ``a process floods a state'', 
+\destutter, \interleave, and ``process mimics another process'',
+which are used in our proofs later.
+
+\begin{proof}[Proof idea]
+The lemma is proved by copying local runs $x(A)$ and $x(B_1)$,
+and flooding all states in $\visited_\mB(x)$.
+To ensure that at least one process moves infinitely often
+in $y$, we copy one additional (infinite) local run from $x$. Finally, it may
+happen that the resulting collection of local runs violates the interleaving 
+semantics requirement. To resolve this, we add stuttering steps into local 
+runs whenever two or more processes move at the same time, and we 
+remove global stuttering steps in $y$. Since the only difference between 
+$x(A,B_1)$ and $y(A,B_1)$ are stuttering steps, $y$ and $x$ satisfy the same $
+\LTLmX$-properties $h(A,B^{(1)})$. 
+Since $\card{\visited_\mB(x)} \leq 
+\card{B}$, we need at most $1+\card{B}+1$ copies of $B$ in \cutoffsys.
+\end{proof}
+
+\begin{proof}
+Let $c = |B|+2$ and $n \geq c$. Let $x=(s_1,e_1,p_1), (s_2,e_2,p_2) \ldots$ be a run of $\largesys$ that satisfies $\pexists h(A,B_1)$. We construct a run $y$ of the cutoff system $\cutoffsys$ with $y(A, B_1) \simeq x(A, B_1)$.
+
+Let $\visited(x)$ be the set of all visited states by B-processes in run $x$: $\visited(x) = \{ q \| \exists m \exists i: s_m(B_i) = q \}$. 
+
+Construct the run $y$ of \cutoffsys as follows.
+\li
+  \-[a.] We copy runs of $A$ and $B_1$ from $x$ to $y$:
+         $y(A)=x(A)$, $y(B_1)=x(B_1)$;
+
+  \-[b.] Since $x$ is infinite, it has at least one infinitely moving process, denoted $B_\infty$. Devote one unique process $B_\infty$ in \cutoffsys that copies the behaviour of $B_\infty$ of \largesys: $y(B_\infty)=x(B_\infty)$.
+
+  \-[c.] For every $q \in \visited$, there is a process of \largesys, denoted $B_i$, that visits $q$ first, at moment denoted $m_q$. Then devote one unique process in \cutoffsys, denoted $B_{i_q}$, that \emph{floods $q$}: set $y(B_{i_q}) = x(B_i)\slice{1}{m_q}(q)^\omega$. In words: the run $y(B_{i_q})$ repeats exactly that of $x(B_i)$ till moment $m_q$, after which the process is never scheduled.
+
+  \-[d.] Let any other process $B_i$ of \cutoffsys not used in the previous steps (if any) \emph{mimic} the behavior of $B_1$ of \cutoffsys: $y(B_i) = y(B_1)$.
+\il
+The figure illustrates the construction.\ak{\init should be flooded}
+On the left is $\largesys$ and on the right is $(A,B)^{(1,|B|+2)}$
+(i.e., $(A,B)^{(1,5)}$, since $|B|=3$ in the figure).
+
+\begin{figure}[hp]
+\centering
+\scalebox{0.7}{
+\input{guarded-systems/img/disj_flooding_construction}
+}
+\end{figure}
+
+The correctness follows from the observation that any transition of any process at any moment $m$ of $y$ was done by some process in $x$ at moment $m$, and hence is enabled at $m$. Also note that, if $\geq 2$ processes transit simultaneously in $y$, then the guards of their transitions will be enabled even if both of them are removed from the state space\ak{vague}. Note that it is possible that in $y$:
+\li
+  \- more than one process transits at the same moment. Then, \emph{\interleave} the transitions of such processes, namely arbitrarily sequentialize them. \ak{why are enabled}
+  \- at some moment no processes move. Then remove elements of the run $y$ -- the resulting run is denoted $\destutter(y)$.
+\il
+This construction uses $|\visited| + 2 \leq |B|+2$ copies of B (ignoring case (d)).
+\end{proof} 
+
+\begin{tightness}[Disj, \LTLmX, Unfair] \label{obs:disj:tight_prop}
+    The cutoff in Lemma~\ref{disj:le:NonFairDisjunctiveBounding} is tight.
+    I.e., for any $k$ there exist process templates $(A,B)$ with $|B| = k$ 
+    and $\LTLmX$ formula $h(A,B_1)$ such that:
+    $$
+    (A,B)^{(1,|B|+2)} \models \pexists h(A,B_1) ~~and~~ 
+    (A,B)^{(1,|B|+1)} \not\models \pexists h(A,B_1).
+    $$
+\end{tightness}
+\begin{proof}
+The idea of the proof relies on the subtleties of the definition of a run: it is infinite (thus not globally deadlocked), and in each step of a run exactly one process moves. 
+
+Consider the templates from Figure~\ref{fig:obs:disj:tight_prop} and let $\pexists h(A,B_1) = \pexists (\eventually 3_{B_1} \land \eventually\always (2_{B_1} \land {end}_A))$. In words: there exists a run in a system where process $B_1$ visits $3_B$ and process $B_1$ with $A$ eventually always stay in $2_B$ and ${end}_A$.
+\begin{figure}[tb]
+\centering
+\begin{subfigure}[b]{0.35\textwidth}\center
+\scalebox{0.66}{\input{guarded-systems/img/disj_tight_propAB_tmplA}}
+\caption*{Template A}
+\end{subfigure}
+\begin{subfigure}[b]{0.62\textwidth}\center
+\scalebox{0.66}{\input{guarded-systems/img/disj_tight_propAB_tmplB}}
+\caption*{Template B}
+\end{subfigure}
+\caption{Templates for proving Tightness~\ref{obs:disj:tight_prop}}
+\label{fig:obs:disj:tight_prop}
+\end{figure}
+
+We need one process in every state of $B$ to enable the transitions of $A$ to ${all}_A$. Only when $A$ in ${all}_A$, $B_1$ can move $3_B \to 1_B$, and then at some point to $2_B$. After $B_1$ moves $3_B \to 1_B$, $A$ moves ${all}_A \to {end}_A$, which requires process $B_{i \neq 1}$ in $3_B$. Finally, to make the run infinite, there should be at least two processes in the state $k_B$.
+Hence, every infinite run satisfying the formula needs at least $|B|+2$ $B$-processes.
+\sj{other cases are covered in general lemma below}
+% 
+\end{proof}
+
+
+\subsection{\LTLmX\ Properties with Fairness: New Constructions} \label{gua:sec:ideas-disj-fair}
+
+As for the case without fairness, proving the monotonicity lemma is simple.
+
+\begin{lemma}[Monotonicity: Disj, \LTLmX, Fair] \label{disj:le:FairDisjunctiveMonotonicity}
+For disjunctive systems:
+\begin{align*}
+& \forall n \geq 1: \\
+&(A,B)^{(1, n)} \models \pexists_{uncond} h(A,B_1) 
+\implies
+(A,B)^{(1,n+1)} \models \pexists_{uncond} h(A,B_1),\\
+\end{align*}
+\end{lemma}
+\begin{proof}
+In run $x$ of $(A,B)^{(1,n)}$ with $n \geq 1$ all processes move infinitely often. 
+Hence let the run $y$ of $(A,B)^{(1,n+1)}$ copy $x$, 
+and let the new process mimic an infinitely moving B process of $(A,B)^{(1,n)}$.
+\end{proof}
+
+To prove the bounding lemma, we introduce two new constructions.
+We need new constructions, because the flooding construction does not preserve fairness,
+and also cannot be used to construct deadlocked runs,
+since it does not preserve disabledness of transitions of processes $A$ or $B_1$.
+
+Consider the proof task of the bounding lemma for disjunctive systems with fairness:
+given an unconditionally fair run $x$ of 
+\largesys with 
+$x \models h(A,B^{(1)})$, we want to construct an unconditionally fair run $y$ 
+of \cutoffsys with $y \models h(A,B^{(1)})$. In contrast to unfair systems, we 
+need to ensure that all processes move infinitely often in $y$. 
+The insight is 
+that after a finite time all processes will start looping 
+around some set $\visited^\inf$ of states. We construct a run $y$ that
+mimics this. To this end, we introduce two constructions. \emph{Flooding with
+evacuation} is similar to flooding, but instead of keeping
+processes in their flooding states forever it evacuates the processes into 
+$\visited^\inf$. \emph{Fair extension} lets all processes move infinitely 
+often without leaving $\visited^\inf$.
+
+\myparagraph{Flooding with evacuation}
+Given a subset $\mF \subseteq \mB$
+%\footnote{In this section we will use only $\mP_1 = \{B_1\}$, 
+%          but for the case of deadlocks we will need a set.  
+%          $\mP_1$ is a set of processes whose local runs we will copy 
+%          from $x$ to $y$ later in the proof.} 
+and an infinite run $x=(s_1,e_1,p_1)\ldots$ of \largesys, 
+define
+\begin{align}
+& \visInf{\mF}{x} = \{ q \|\! \exists \text{ infinitely many } ~~~~ m\!:  
+s_m(B_i) = q 
+\text{ for some } B_i \in \mF \} \label{disj:def_vinf_wrt} \\
+& \visFin{\mF}{x} = \{ q \|\! \exists \text{ only finitely many } m\!:  
+s_m(B_i) = q
+\text{ for some } B_i\in \mF \} \label{disj:def_vfin_wrt}
+\end{align}
+%
+Let $q \in \visFin{\mF}{x}$.
+In run $x$ there is a moment $f_q$ when $q$
+is reached for the first time by some process from $\mF$, denoted $B_{\first_q}$. 
+Also, in run $x$ there is a moment $l_q$ such that:
+$s_{l_q}(B_{\last_q})=q$ for some process $B_{\last_q} \in \mF$, 
+and $s_t(B_i)\neq q$ for all $B_i \in \mF$,
+$t > l_q$%
+---i.e., when some process from $\mF$ is in state $q$ for the last time in $x$. 
+Then, saying that process $B_{i_q}$ of \cutoffsys\ 
+{\em floods $q \in \visFin{\mF}{x}$ and then evacuates into $\visInf{\mF}{x}$} 
+means: 
+$$
+y(B_{i_q}) = x(B_{\first_q})\slice{1}{f_q} \ \cdot\ (q)^{(l_q - f_q + 1)} \cdot \ 
+x(B_{\last_q})\slice{l_q}{m} \ \cdot \ (q')^\omega,
+$$
+where $q'$ is the state in $\visInf{\mF}{x}$ that $x(B_{\last_q})$ reaches first, 
+at some moment $\time \geq l_q$.
+In words, process $B_{i_q}$ mimics process $B_{\first_q}$ until it reaches $q$, 
+then does nothing until process $B_{\last_q}$ starts leaving $q$, 
+then it mimics $B_{\last_q}$ until it reaches $\visInf{\mF}{x}$.
+
+The construction ensures: 
+if we copy local runs of all processes not in $\mF$ from $x$ to $y$, 
+then all transitions of $y$ are enabled. 
+This is because, for any process $p$ of $\cutoffsys$ that takes a transition in $y$ at any moment, 
+the set of states visible to process $p$ is a superset of the set of states 
+visible to the original process in \largesys whose transitions process $p$ copies.
+
+
+\myparagraph{Fair extension} 
+\ak{explain intuition about those three sets}
+\ak{adapt to dead}
+Here, we consider a path $x$ that is the postfix of an unconditionally fair run $x'$ of $\largesys$, 
+starting from the moment where no local states from $\visFin{\mB}{x'}$ are visited anymore. 
+We construct a corresponding unconditionally-fair path $y$ of $\cutoffsys$, 
+where no local states from $\visFin{\mB}{x'}$ are visited.
+
+Formally, let $n \geq 2|B|$, and $x$ an unconditionally-fair path of $\largesys$ such that
+$\visFin{\mB}{x}=\emptyset$.
+Let $c \geq 2|B|$, and $s_1'$ a state of \cutoffsys
+with
+\li
+\- $s_1'(A_1)=s_1(A_1)$, $s_1'(B_1)=s_1(B_1)$;
+
+\- for every $q \in \visInf{B_2..B_n}{x} \smi \visInf{B_1}{x}$,
+   there are two processes $B_{i_q}, B_{i_q'}$ of \cutoffsys
+   that start in $q$, i.e., $s_1'(B_{i_q})=s_1'(B_{i_q'})=q$;
+
+\- for every $q \in \visInf{B_2..B_n}{x} \cap \visInf{B_1}{x}$,
+   there is one process $B_{i_q}$ of \cutoffsys
+   that starts in $q$;
+
+\- for some $\qstar \in \visInf{B_2..B_n}{x} \cap \visInf{B_1}{x}$,
+   there is one additional process of \cutoffsys, 
+   different from any in the above, 
+   called $B_{i_\qstar'}$,
+   that starts in $\qstar$;
+   and
+
+\- any other process $B_i$ of \cutoffsys 
+   starts in some state of $\visInf{B_2..B_n}{x}$.
+\il
+Note that, if $\visInf{B_2..B_n}{x}\cap \visInf{B_1}{x} = \emptyset$, 
+then the third and fourth pre-requisite are trivially satisfied.
+
+The fair extension extends state $s_1'$ of \cutoffsys 
+to an unconditionally-fair path $y=(s'_1,e'_1,p'_1)\ldots$ 
+with $y(A_1,B_1) = x(A_1,B_1)$ as follows.
+\li
+\-[(a)] $y(A_1)=x(A_1)$, $y(B_1)=x(B_1)$.
+
+\-[(b)] For every $q \in \visInf{B_2..B_n}{x} \smi \visInf{B_1}{x}$: 
+       in run $x$ there is $B_i \in \{B_2..B_n\}$ 
+       that starts in $q$ and visits it infinitely often. 
+       Let $B_{i_q}$ and $B_{i'_q}$ of \cutoffsys mimic $B_i$ in turns: 
+       first $B_{i_q}$ mimics $B_i$ until it reaches $q$, 
+       then $B_{i'_q}$ mimics $B_i$ until it reaches $q$, and so on.
+
+\-[(c)] Arrange the states of $\visInf{B_2..B_n}{x}\cap \visInf{B_1}{x}$ 
+       in some order $(\qstar, q_1, \ldots, q_l)$.  
+       The processes $B_{i_\qstar'}, B_{i_\qstar}, B_{i_{q_1}}, \ldots, B_{i_{q_l}}$ 
+       behave as follows.
+       Start with $B_{i_\qstar'}$: 
+       when $B_1$ enters $\qstar$ in $y$, it carries%
+       \footnote{``Process $B_1$ starting at moment $m$ carries process $B_i$ 
+                 from $q$ to $q'$'' means: process $B_i$ mimics 
+                 the transitions of $B_1$ starting at moment $m$ at $q$ 
+                 until $B_1$ first reaches $q'$.}
+       $B_{i_\qstar'}$             from $\qstar$ to $q_1$, 
+       then carries $B_{i_{q_1}}$ from $q_1$ to $q_2$, \ldots, 
+       then carries $B_{i_{q_l}}$ from $q_l$ to $\qstar$, 
+       then carries $B_{i_\qstar}$ from $\qstar$ to $q_1$, 
+       then carries $B_{i_\qstar'}$ from $q_1$ to $q_2$, 
+       then carries $B_{i_{q_1}}$ from $q_2$ to $q_3$,
+       and so on.
+
+%\-[c2.] otherwise, $\visited_{\inf\cap B_1}{x} = \{ q^\star \}$. Then $B_1$ only ever makes transitions $q^\star \to q^\star$, thus let process $B_{i_{q^\star}}$ mimic this.
+
+\-[(d)] Any other $B_i$ of \cutoffsys,
+       starting in $q \in \visInf{B_2..B_n}{x}$,
+       mimics $B_{i_q}$.
+\il
+Note that parts (b) and (c) of the construction ensure that there is always at
+       least one process in every state from $\visInf{B_2..B_n}{x}$. This
+       ensures that the guards of all transitions of the construction are satisfied.
+Excluding processes in (d), the fair extension uses up to $2|B|$ copies of $B$.%
+\footnote{A careful reader may notice that,
+          if
+          $|\visInf{B_1}{x}|=1$ and $|\visInf{B_2..B_n}{x}|=|B|$,
+          then the construction uses $2|B|+1$ copies of $B$.
+          But one can slightly modify the construction for this special case,
+          and remove process $B_{i_\qstar'}$ from the pre-requisites.}
+%\li
+%\- if $\visInf{B_2..B_n}{x} \cap \visInf{B_1}{x} = \emptyset$, then 
+%     $$\leq 1+2|\visInf{B_2..B_n}{x}| \leq 1+2(|B|-1) = 2|B|-1$$
+%   (note that $\visInf{B_1}{x}$ contains at least one state)
+%
+%\- otherwise:\\
+%   let $smi = \visInf{B_2..B_n}{x} \smi \visInf{B_1}{x}$, \\
+%   let $inter = \visInf{B_2..B_n}{x} \cap \visInf{B_1}{x}$, \\
+%   then
+%   $$\leq 1+2|smi| + |inter| + 1 \leq 1+2(|B|-1) + 1 + 1 = 2|B|+1$$
+%   $$\leq 1+2|smi| + |inter| + 1 \leq 1+2(|B|-2) + 2 + 1 = 2|B|+1$$
+%\il
+%
+%
+%%%%%%%%%%%%% OLD FAIR EXTENSION %%%%%%%%%%%%%%%%%%%%%%
+%Let $x=(s_1,e_1,p_1)\ldots$ be an unconditionally-fair path $x$ of $\largesys$, let $\visited_\fin{x}$ and $\visited_\inf{x}$ be defined wrt. no processes, let $n\geq 2|\visited_\inf{x}|$, and let $x$ satisfy: 
+%\li
+%  \- every $B_i\neq B_1$ visits $s_1(B_i)$ infinitely often
+%  \- $\visited_\fin{x} = \emptyset$,
+%\il
+%and let $s_1'$ be a state of \cutoffsys with $c \geq 2|\visited_\inf{x}|$ that satisfies: 
+%\li
+%  \- $s_1'(A)=s_1(A)$, $s_1'(B_1)=s_1(B_1)$
+%  \- for every $q \in \visited_\inf{x}$ there are two processes of \cutoffsys called $B_{i_q}$, $B_{i'_q}$ with $s_1'(B_{i_q}) = s_1'(B_{i'_q}) = q$
+%  \- for all other processes $B_i$ of \cutoffsys (if any): $s_1'(B_i) \in \visited_\inf{x}$.
+%\il
+%The fair extension extends state $s_1'$ of \cutoffsys to an unconditionally-fair path $y=(s'_1,e'_1,p'_1)\ldots$ with $x(A,B_1) = y(A,B_1)$ as follows. Let $\visited_{\inf\cap B_1}{x}$ be the set of states visited infinitely often by process $B_1$, and $q^\star=s_1(B_1)$:
+%\li
+%\-[a.] $y(A)=x(A)$, $y(B_1)=x(B_1)$
+%\-[b.] for every $q \in \visited_\inf{x} \smi \visited_{\inf\cap B_1}{x}$: in run $x$ there is $B_i$ that starts in $q$ and visits it infinitely often. Let $B_{i_q}$ and $B_{i'_q}$ of \cutoffsys mimic $B_i$ in turns: first $B_{i_q}$ mimics $B_i$ until it reaches $q$, then $B_{i'_q}$ mimics $B_i$ until it reaches $q$,\dots 
+%\-[c1.] if $\visited_{\inf\cap B_1}\smi \{ q^\star \} \neq \emptyset$:
+%\li
+%  \- order arbitrarily $\visited_{\inf\cap B_1}\smi \{ q^\star \} = (q_1, q_2, \ldots, q_k)$
+%  \- the processes $\{ B_{i_{q^\star}}, B_{i_{q_1}}, B_{i'_{q_1}}, B_{i_{q_2}}, B_{i'_{q_2}}, \ldots, B_{i_{q_k}}, B_{i'_{q_k}} \}$ behave as follows:
+%  \- start with $B_{i_{q_1}}$: when $B_1$ enters $q_1$, it carries $B_{i_{q_1}}$ from $q_1$ to $q_2$, then carries $B_{i_{q_2}}$ from $q_2$ to $q_3$, \ldots, then carries $B_{i_{q_k}}$ from $q_k$ to $q^\star$, then carries $B_{i_{q^\star}}$ from $q^\star$ to $q_1$, then carries $B_{i'_{q_1}}$ from $q_1$ to $q_2$, and so on.
+%\il
+%\-[c2.] otherwise, $\visited_{\inf\cap B_1} \!=\! \{ q^\star \}$: $B_1$ only transits $q^\star \!\to\! q^\star$; let $B_{i_{q^\star}}$ mimic $B_1$
+%
+%\-[d.] let other processes $B_i$ of \cutoffsys with $s_1'(B_i)=q$ (if any) mimic $B_{i_q}$.
+%\il
+%%%%%%%%%%%%% END OF OLD FAIR EXTENSION %%%%%%%%%%%%%%%%%%%%%%
+
+%\begin{proof}[Proof idea of the bounding lemma]
+
+Now we are ready to prove the bounding lemma.
+
+\begin{lemma}[Bounding: Disj, \LTLmX, Fair] \label{disj:le:FairDisjunctiveBounding}
+For disjunctive systems:
+\begin{align*}
+&\forall n>2|B|: \\
+&(A,B)^{(1,2|B|)} \models \pexists_{uncond} h(A,B_1) &
+&\impliedby& &
+(A,B)^{(1,n)} \models \pexists_{uncond} h(A,B_1),\\
+\end{align*}
+% 
+\end{lemma}
+\begin{proof}
+\sj{for weak or strong fairness, the same construction can be used; evacuation is not necessary, but also doesn't increase the cutoff if we use it; difficulty: show that cutoff is still tight
+}
+Let $c=2\card{B}$. 
+Given an unconditionally-fair run $x$ of $\largesys$,
+we construct an unconditionally-fair run $y$ of the cutoff system $\cutoffsys$ 
+such that $y(A,B_1)$ is stuttering equivalent to $x(A,B_1)$.
+
+Note that in $x$ there is a moment $m$ such that all local states that are visited after $m$ are in $\visInf{\mB}{x}$.
+
+The construction has two phases. In the first phase, we apply flooding for states in $\visInf{\mB}{x}$, and flooding with evacuation for states in $\visFin{\mB}{x}$:
+\li
+\-[(a)] $y(A)=x(A)$, $y(B_1)=x(B_1)$;
+
+\-[(b)] for every $q \in \visInf{B_2..B_n}{x} \smi \visInf{B_1}{x}$, 
+       devote two processes of $\cutoffsys$ that flood $q$;
+
+\-[(c)] for some $\qstar \in \visInf{B_2..B_n}{x} \cap \visInf{B_1}{x}$,
+       devote one process of \cutoffsys that floods $\qstar$;
+
+\-[(d)] for every $q \in \visFin{B_2..B_n}{x}$, 
+       devote one process of $\cutoffsys$ that 
+       floods $q$ and evacuates into $\visInf{B_2..B_n}{x}$;
+       and
+
+\-[(e)] let other processes (if any) mimic process $B_1$.
+\il
+The phase ensures that at moment $m$ in $y$, 
+there are no processes in $\visFin{\mB}{x}$, 
+and all the pre-requisites of the fair extension are satisfied.
+
+The second phase applies the fair extension, 
+and then establishes the interleaving semantics 
+as in the bounding lemma in the non-fair case.
+The overall construction uses up to $2|B|$ copies of $B$.
+% Indeed: 
+% fin&smi=0, fin&cap=0,
+% smi = InfB2..Bn - cap
+% InfB2..Bn <= B - fin
+% Then:
+% 1+2smi+1cap+1+fin <= 1+2(InfB2..Bn-cap)+cap+1+fin = 
+%                      2+2InfB2..Bn-cap-fin <=
+%                      2+2B-cap-fin
+% now split case:
+% everywhere fin>0 (otherwise 2|B| follows from the analysis of the fair extension)
+% note: if cap=0, then we actually have (recall fair pre)
+%       1+2smi+fin =< 1+2(B-InfB1-fin)+fin = 1+2B-2InfB1-2fin =< 2B-3
+% thus cap>0,fin>0
+% then 2+2B-cap-fin =< 2B
+\end{proof}
+
+\begin{tightness}[Disj, \LTLmX, Fair] \label{obs:disj:fair_tight_prop}
+The cutoff in Lemma~\ref{disj:le:FairDisjunctiveBounding} is tight.
+I.e., 
+for any $k$ there exist process templates $(A,B)$ with $|B| = k$ 
+and $\LTLmX$ formula $h(A,B_1)$ such that:
+$$
+(A,B)^{(1,2|B|)} \models \pexists h(A,B_1) ~~and~~ 
+(A,B)^{(1,2|B|-1)} \not\models \pexists h(A,B_1).
+$$
+\ak{what happens if we bound $T_A$?}
+\end{tightness}
+\begin{proof}
+Consider process templates $A,B$ from Figure~\ref{fig:obs:disj:fair_tight_prop}
+and the property $\pexists \true$.
+% 
+\begin{figure}[tb]
+\centering
+\begin{subfigure}[b]{0.35\textwidth}\center
+\scalebox{0.75}{\input{guarded-systems/img/disj_fair_tight_propAB_tmplA}}
+\caption*{Template A}
+\end{subfigure}
+\hspace{1cm}
+\begin{subfigure}[b]{0.55\textwidth}\center
+\scalebox{0.75}{\input{guarded-systems/img/disj_fair_tight_propAB_tmplB}}
+\caption*{Template B}
+\end{subfigure}
+\caption{Templates for proving Tightness~\ref{obs:disj:fair_tight_prop}}
+\label{fig:obs:disj:fair_tight_prop}
+\end{figure}
+%
+\end{proof}
+
+
+\subsection{Deadlocks without Fairness: Updated Constructions} \label{gua:sec:proofs-disj-deadlock-unfair}
+
+%The lemma for deadlock detection, for fair and unfair cases,
+%is proven for $n \geq |B|+1$.
+%In the case of local deadlocks, 
+%process $B_{n+1}$ mimics a process that moves infinitely often in $x$.
+%In the case of global deadlocks, 
+%by pigeon hole principle, 
+%in the global deadlock state there is a state $q$ with at least two processes in it---let process $B_{n+1}$ mimic a process that deadlocks in $q$.
+
+\begin{lemma}[Monotonicity: Disj, Deadlocks, Unfair]
+\label{mono_lem_disj_deadlocks_unfair}
+    For disjunctive systems:
+    $$\forall n\geq |B|+1: (A,B)^{(1,n)} \textit{ has a deadlock} \ 
+    \Impl\ 
+    (A,B)^{(1,n+1)} \textit{ has a deadlock.}$$
+\end{lemma}
+\begin{proof}
+Given a deadlocked run $x$ of $(A,B)^{(1,n)}$,
+we build a deadlocked run of $(A,B)^{(1,n+1)}$. 
+If the run $x$ is locally deadlocked,
+then it has at least one infinitely moving process, 
+thus let the additional process mimic that process. 
+If the run $x$ is globally deadlocked run, 
+then due to $n>|B|$ in some state there are at least two processes deadlocked. 
+Thus, let the new process mimic a process deadlocked in that state---%
+the run constructed will also be globally deadlocked.
+\end{proof}
+
+
+\begin{lemma}[Bounding: Disj, Deadlocks, Unfair] \label{lem_disj_deadlocks_unfair}
+For disjunctive systems:
+\li
+  \- with $c=|B|+2$ and any $n>c$:
+  $$(A,B)^{(1,c)} \textit{ has a local deadlock} \ \Implied\ (A,B)^{(1,n)} \textit{ has a local deadlock;}$$
+  
+  \- with $c=2|B| - 1$ and any $n>c$
+  $$(A,B)^{(1,c)} \textit{ has a global deadlock} \ \Implied\ (A,B)^{(1,n)} \textit{ has a global deadlock;} $$
+  
+  \- with $c=2|B|-1$ and any $n>c$:
+  $$(A,B)^{(1,c)} \textit{ has a deadlock} \ \Implied\ (A,B)^{(1,n)} \textit{ has a deadlock.}$$
+\il
+\ak{seems not tight}
+\end{lemma}
+\begin{proof}[Proof idea]
+First, consider the case of global deadlocks.
+The insight is to divide deadlocked local states into two disjoint sets, 
+$\dead_1$ and $\dead_2$, as follows.
+Given a globally deadlocked run $x$ of \largesys, 
+for every $q \in \dead_1$,
+there is a process of \largesys deadlocked in $q$ with input $i$,
+that has an outgoing transition guarded ``$\exists q$''%
+---hence, adding one more process into $q$ would unlock the process.
+%\sj{do we always consider inputs correctly? what if $q \in \dead_1$ for some $e$, but $q \in \dead_2$ for $e'$?}\ak{thanks, modified, now it is impossible}
+In contrast, $q \in \dead_2$ if any process deadlocked in $q$
+stays deadlocked after adding more processes into $q$.
+Let us denote the set of $B$-processes deadlocked in $\dead_1$ by $\mD_1$.
+Finally, abuse the definition in Eq.~\ref{disj:def_vfin_wrt}
+and denote by $\visFin{\mB\smi\mD_1}{x}$ the set of states
+that are visited by $B$-processes not in $\mD_1$ before reaching a deadlocked state.
+
+Given a globally deadlocked run $x$ of \largesys with $n\geq 2|B|-1$, 
+we construct a globally deadlocked run $y$ of \cutoffsys with $c = 2|B|-1$ as follows.
+\li
+\- We copy from $x$ into $y$ the local runs of processes in $\mD_1 \cup \{A\}$;
+\- flood every state of $\dead_2$;
+   and
+\- for every $q \in \visFin{\mB\smi\mD_1}{x}$,
+   flood $q$ and evacuate into $\dead_2$.
+\il
+The construction ensures: 
+(1) for any moment and any process in $y$,
+    the set of local states that are visible to the process includes all the states that were visible 
+    to the corresponding process in \largesys whose transitions we copy;
+(2) in $y$, there is a moment when all processes deadlock in $\dead_1 \cup \dead_2$.
+
+For the case of local deadlocks, 
+the construction is slightly more involved,
+since we also need to copy the behaviour of an infinitely moving process.
+\end{proof}
+
+\begin{proof}
+Given a (globally or locally) deadlocked run of $\largesys$,
+we construct (globally or locally) deadlocked run of $\cutoffsys$, 
+where $c$ depends on the nature of the given run. 
+We do this using the construction template. 
+
+Let $\mB=\{B_1,...,B_n\}$.
+The template depends on the set $\mC \subseteq \{B_1,...,B_c\}$
+and is as follows.
+\li
+  \-[a.] Set $y(A)=x(A)$;
+  \-[b.] for every $B_i \in \mC$, set $y(B_i)=x(B_i)$;
+  \-[c.] for every $q \in \visInf{\mB\smi\mC}{x}$, 
+         devote one process of \cutoffsys that floods $q$;
+  \-[d.] for every $q \in \visFin{\mB\smi\mC}{x}$, 
+         devote one process of \cutoffsys that floods $q$ 
+         and then evacuates into $\visInf{\mB\smi\mC}{x}$;
+         and
+  \-[e.] let other processes (if any) mimic some process from (c).
+\il
+
+\myparagraph{1) Local deadlock}
+We distinguish three cases: 
+\li
+  \-[1a)] $A$ deadlocks, $B_1$ moves infinitely often;
+  \-[1b)] $A$ moves infinitely often, $B_1$ deadlocks; and
+  \-[1c)] $A$ neither deadlocks nor moves infinitely often, 
+          $B_1$ deadlocks, $B_2$ moves infinitely often.
+\il
+
+\myparagraphraw{1a:} ``$A$ deadlocks, $B_1$ moves infinitely often''. 
+
+Let $c=|B|+1$, and $\mC=\{B_1\}$.
+Note that $\visInf{B_2..B_n}{x} \neq \emptyset$. 
+The resulting construction uses 
+$|\visFin{B_2..B_n}{x}| + |\visInf{B_2..B_n}{x}| + 1 
+ \leq 
+ |B| + 1$ 
+copies of B.
+\ak{seems tight}\ak{correctness}
+
+\myparagraphraw{1b:} ``$A$ moves infinitely often, $B_1$ deadlocks''. 
+
+Let $c=|B|+1$, and $\mC=\{B_1\}$.
+Let $q_\bot$ be the state in which $B_1$ deadlocks.
+Instantiate the construction template.
+
+Process $B_1$ of \cutoffsys is deadlocked in $y$ starting from some moment $d$,
+because any state it sees (in $\visInf{A,B_2..B_n}{x}$)
+was also seen by $B_1$ in \largesys in $x$ at some moment $d' \geq d$
+(note that $d'$ may be not the same moment as $d$).
+%\footnote{Note about open systems: here we use the fact from the definitions 
+%          that inputs to $B_1$ do not change.
+%          This ensures that the set of states that $B_1$ should not see in order
+%          to stay deadlocked does not change over time.}
+
+
+\myparagraphraw{1c:} ``$A$ neither deadlocks nor moves infinitely often, 
+                       $B_1$ deadlocks, $B_2$ moves infinitely often''. 
+
+Instantiate the construction template with $c=|B|+2$ and $\mC = \{B_1,B_2\}$.
+\ak{seems not tight}\ak{correctness}
+
+\smallskip
+Finally, $|B|+2$ is a (possibly not tight) cutoff for local deadlock detection problem.
+
+
+\myparagraph{2) Global deadlock}
+Let $x=(s_1,e_1,p_1)...(s_d,e_d,\bot)$ be a globally deadlocked run of $\largesys$ 
+with $n\geq c$.
+
+Let us abuse the definition of $\visInf{\mF}{x}$ and $\visFin{\mF}{x}$,
+in Eq.~\ref{disj:def_vinf_wrt} and \ref{disj:def_vfin_wrt} resp., 
+and adapt it to the case of finite runs.
+To this end, given a finite run $x=(s_1,e_1,p_1)...(s_d,e_d,\bot)$, 
+extend it to the infinite sequence $(s_1,e_1,p_1)...(s_d,e_d,\bot)^\omega$, 
+and apply the definition of $\visInf{\mF}{x}$ and $\visFin{\mF}{x}$ to the sequence.
+
+Let $\mD_1$ be the set of processes deadlocked in unique states:
+$\forall p\in \mD_1 \nexists p' \neq p: s_d(p')=s_d(p)$.
+Instantiate the construction template with $\mC = \mD_1$ and $c=2|B|-1$.
+\footnote{$2|B|-1$ copies is enough, because: 
+          $\visFin{\mB\smi\mC}{x} \cap \visInf{\mB\smi\mC}{x} = \emptyset$,
+          $\visInf{\mB\smi\mC}{x} \cap \visInf{\mC}{x} = \emptyset$,
+          and if $\visFin{\mB\smi\mC}{x} \neq \emptyset$, 
+          then $\visInf{\mB\smi\mC}{x} \neq \emptyset$.}
+\ak{seems not tight}
+
+%The construction uses $|dead1| + |dead2| + |\visited_{\fin-P_\bot^1}(x)| \leq 2|B|-1$ copies of B.\ak{seems not tight}\ak{CHECK}\ak{correctness}
+
+\myparagraph{3) Deadlocks}
+As the cutoff for the deadlock detection problem we take the largest cutoff in (1)--(2), namely, $2|B|-1$,
+but it may be not tight%
+---finding the tight cutoffs for local deadlock and for deadlock detection problems is an open problem.
+
+\ak{tried to refine but could not -- the trial is commented out}
+% AK: try to utilize the existence of the order?
+% Now let us refine the estimate:
+% \li
+% \- `unique finite state' is any state in $\visited_{\fin+P_1_\bot}$ that either is not in $ \visited_{\fin-P_1_\bot} $, or the state that appears not in $]f_q,l_q[_{-P_1_\bot}$
+% 
+% \- intuitively, state is unique finite if we cannot make it `visible' by using the flooding and evacuating construction wrt. $ \visited_{\fin-P_1_\bot} $, $\visited_{\inf-P_1_\bot}$. Otherwise, if state is not unique finite then  we can flood the state and then evacuate into $ \visited_{\inf-P_1_\bot} $ 
+% 
+% \- let $U^c \subseteq P_1_\bot$ be the set of processes that have unique finite states on its run to $q_\bot \in \visited_\bot^1$. Let $U^f = P_1_\bot\smi U^c$.
+% 
+% \- note that for any $p \in U^f$ any its finite state can be flooded and then evacuated into $ \visited_{\inf-P_1_\bot} $ using local runs of $\mathcal{B}\smi P_1_\bot$ processes. Intuitively, this means that $U^f$ processes' finite states are not needed.
+% 
+% \- let us divide $\visited_\bot^1$ into two disjiont sets: $\visited_\bot^c$ (and corr. processes are $U^c$) is the set of states whose deadlocked paths do have a unique finite state, and $\visited_\bot^f$ (and corr. processes are $U^f$) is the set of states whose deadlocked paths do not have a unique finite state.
+% \il
+% 
+% Define $ \visited_{\fin-U^c} $ and $ \visited_{\inf-U^c} $ wrt. $U^c$.
+% Then the construction is:
+% \li
+%   \-[a.] $y(A)=x(A)$
+%   \-[b.] copy the runs of $U^c$ processes (that end in $\visited_\bot^c$)
+%   \-[c.] flood states in $ \visited_{\inf-U^c} $
+%   \-[d.] for any $ q \in \visited_{\fin-U^c} $ devote one process that floods it and then evacuates into $ \visited_{\inf-U^c} \smi \visited_\bot^f$. Note that we can evacuate a state from $ \visited_{\fin-U^c} $ into $ \visited_{\inf-U^c} \smi \visited_\bot^f $, because processes $U^f$ do not contribute to the evacuation by definition.\ak{vague}
+%   \-[e.] let other processes (if any) mimic a process from (c)
+% \il
+% The construction uses $|\visited_\bot^c| + | \visited_{\inf-U^c} | + | \visited_{\fin-U^c} |$. Note that:
+% \li
+%   \- $\visited_\bot^c$, $ \visited_{\inf-U^c} $ are disjoint
+%   \- $\visited_{\inf-U^c}$, $\visited_{\fin-U^c}$ are disjoint
+%   \- possibly $\visited_\bot^c \cap \visited_{\fin-U^c} \neq \emptyset$
+% \il 
+% If some $p \in U^c$, then it has at least one unique finite state $q$: possibly $q \in  \visited_{\inf-U^c} $ or $q \in \visited_{\fin-U^c}$, but $q \not\in \visited_\bot^c$. \ak{stuck here -- it is possible that all $U^c$ processes share a single unique finite state}
+\end{proof}
+
+\begin{tightness}[Disj, Deadlocks, Unfair] \label{obs:disj:tight_deadlock}
+The cutoff $c=2|B|-1$ for deadlock detection in disjunctive systems is \emph{asymptotically optimal but possibly not tight}.
+I.e., for any $k$ there are templates $(A,B)$ with $|B|=k$ such that:
+$$
+(A,B)^{(1,|B|-1)} \textit{ does not have a deadlock, but } (A,B)^{(1,|B|)} \textit { does}.
+$$
+\end{tightness}
+\begin{proof}
+Figure~\ref{fig:obs:disj:tight_deadlock} illustrates templates $(A,B)$ to prove the asymptotic optimality of cutoff $2|B|-1$ for deadlock detection problem. Template $A$ is any that never deadlocks. The system has a local deadlock only when there are at least $|B|$ copies of $B$, which is a constant factor of $2|B|-1$.
+\begin{figure}[tb] \centering
+\makebox[0.4\textwidth][c]{
+\scalebox{0.75}{\input{guarded-systems/img/disj_tight_deadlock_tmpl}}
+}
+\caption{Templates for proving Tightness~\ref{obs:disj:tight_deadlock}}
+\label{fig:obs:disj:tight_deadlock}
+\end{figure}
+\end{proof}
+
+%--- global deadlocks: fair and unfair:
+%C: processes that dead1
+%F: processes that dead2
+%We copy local runs of dead1.
+%We flood deadlocked states of dead2, and flood and evacuate non-deadlocked states of dead2.
+%
+%--- local deadlocks: unfair:
+%I: processes that move infinitely often
+%D: processes that dead
+%copy local run of one process from I, 
+%copy one local run of process from C,
+%flood and evacuate finitely visited states by processes except copied
+%
+%--- local deadlocks: fair:
+%I: processes that move infinitely often
+%C: processes that dead1
+%F: processes that dead2
+%Copy local runs of C, 
+%flood and evacuate finitely visited states of F\\C, 
+%flood dead or infinitely often visited states of F\\C.
+
+
+\subsection{Deadlocks with Fairness: New Constructions} \label{gua:sec:proofs-disj-deadlock-fair}
+
+\begin{lemma}[Monotonicity: Disj, Deadlocks, Fair] \label{mono_lem_disj_deadlocks_fair}
+For disjunctive systems, on strong-fair or finite runs:
+$$
+\forall n\geq |B|+1: (A,B)^{(1,n)} \textit{ has a deadlock} 
+\ \Impl\ 
+(A,B)^{(1,n+1)} \textit{ has a deadlock.}
+$$
+\end{lemma}
+\begin{proof}
+See proof of Lemma~\ref{mono_lem_disj_deadlocks_unfair}.
+\end{proof}
+
+\begin{lemma}[Bounding: Disj, Deadlocks, Fair] \label{le:disj:fair_tight_deadlock}
+For disjunctive systems, on strong-fair or finite runs:
+\li
+  \- with $c=2|B|-1$ and any $n>c$:
+  $$(A,B)^{(1,c)} \textit{ has a local deadlock} \ \Implied\ (A,B)^{(1,n)} \textit{ has a local deadlock;}$$
+  
+  \- with $c=2|B| - 1$ and any $n>c$
+  $$(A,B)^{(1,c)} \textit{ has a global deadlock} \ \Implied\ (A,B)^{(1,n)} \textit{ has a global deadlock;} $$
+  
+  \- with $c=2|B|-1$ and any $n>c$:
+  $$(A,B)^{(1,c)} \textit{ has a deadlock} \ \Implied\ (A,B)^{(1,n)} \textit{ has a deadlock.}$$
+\il
+\end{lemma}
+The proofs are similar to that of Lemma~\ref{lem_disj_deadlocks_unfair} (the case without fairness):
+the case of global deadlocks is exactly the same,
+the case of local deadlocks differ---we additionally use the fair extension to ensure the resulting run is fair.
+\begin{proof}
+
+\providecommand{\deadOne}[1]{\dead_{<2}(#1)}
+\providecommand{\deadTwo}[1]{\dead_2(#1)}
+
+If $\largesys$ has a global deadlock, 
+then the fairness does not influence the cutoff, 
+and the proof from Lemma~\ref{lem_disj_deadlocks_unfair}, 
+case ``Global Deadlocks'', applies and gives the cutoff $2|B|-1$. 
+Hence below consider only the case of local deadlocks. 
+
+Given a strong-fair deadlocked run $x$ of $\largesys$, 
+we first construct a strong-fair deadlocked run $y$ of $\cutoffsys$ 
+with $c=2|B|$ and then argue that $c$ can be reduced to $2|B|-1$. 
+The construction is similar to that in Lemma~\ref{lem_disj_deadlocks_unfair} 
+-- the differences originate from the need to infinitely move 
+non deadlocked processes.
+
+Let $\deadOne{x}$ be the set of deadlocked states in the run $x$ 
+that are only deadlocked if there is no other process in the same state, 
+and let $\mD_1$ be the set of processes deadlocked 
+in the run $x$ in $\deadOne{x}$. 
+Let $\deadTwo{x}$ be the set of states that are deadlocked 
+in the run $x$ even if there is another process in the same state. 
+
+We note the following:
+\li
+\- $|\mD_1| = |\deadOne{x}| \leq |B|$;
+
+\- $\deadOne{x} \cap \deadTwo{x} = \emptyset$;
+
+\- $\visFin{\mB\smi \mD_1}{x} \cap \deadOne{x} \neq \emptyset$
+   is possible, because a state from $\visFin{\mB\smi \mD_1}{x}$ 
+   can first be visited by a process in $\mB \smi \mD_1$, 
+   and later be deadlocked because of the process in $\mD_1$;
+
+\- $\deadTwo{x} \subseteq \visInf{\mB\smi \mD^1}{x}$,
+   and hence $\visFin{\mB \smi \mD_1}{x} \cap \deadTwo{x} = \emptyset$.
+\il
+
+The construction has two phases. 
+The first phase is as follows.
+\li
+\-[a.] For every $p \in \{A\} \cup \mD_1$, set $y(p)=x(p)$;
+
+\-[b.] for every $q \in \deadTwo{x}$, 
+       devote one process of $\cutoffsys$ that floods it;
+
+\-[c.] for every $q \in \visInf{\mB \smi \mD_1}{x} \smi \deadTwo{x}$,
+       devote two processes of $\cutoffsys$ that flood it;
+
+\-[d.] for every $q \in \visFin{\mB \smi \mD_1}{x}$, 
+       devote one process of $\cutoffsys$ that floods it
+       and then evacuates into $\visInf{\mB \smi \mD_1}{x}$;
+       and
+
+\-[e.] let other processes (if any) mimic some process from (c).
+\il
+After this phase all $B$ processes will be in 
+$\visInf{\mB \smi \mD_1}{x} \cup \deadOne{x}$. 
+
+The second phase applies to processes in 
+$\visInf{\mB \smi \mD_1}{x} \smi \deadTwo{x}$ the fair extension%
+\footnote{The fair extension requires the run $x$ to be unconditionally-fair, 
+          but here we have a run in which all processes that are not deadlocked
+          move infinitely often.
+          To adapt the construction to this case:
+          copy local runs of processes $\{A\} \cup \mD_1$,
+          and do not extend local runs of processes that are in a
+          state in $\dead_2$.}.
+
+% The resulting configuration sequence is a run of $\cutoffsys$ by correctness of the flooding, evacuation, fair extension, interleaving and destuttering constructions\ak{prove}. Furthermore, for every $q \in \deadOne$ we have exactly one process in $\cutoffsys$ that eventually stays in $q$, and for every $q \in \deadTwo$ -- at least one such process; they are eventually deadlocked in $q$ because the states that appear infinitely often in the run $x$ of $\cutoffsys$ are the same as in the resulting run of $\largesys$.
+
+How many processes does the construction use? 
+Note that the sets 
+$\deadOne{x} \cup \visFin{\mB \smi \mD_1}{x}$, 
+$\deadTwo{x}$, 
+$\visInf{\mB \smi \mD_1}{x} \smi \deadTwo{x}$ 
+are disjoint, thus:
+\begin{align}
+& | \visFin{\mB \smi \mD_1}{x} | + |\deadOne{x}| + |\deadTwo{x}| + 2| \visInf{\mB \smi \mD_1}{x} \smi \deadTwo{x} | \leq \label{disj:eq:1} \\
+% 
+& 2|\visFin{\mB \smi \mD_1}{x} \cup \deadOne{x}| + |\deadTwo{x}| + 2| \visInf{\mB \smi \mD_1}{x} \smi \deadTwo{x} | \leq \label{disj:eq:2} \\
+% 
+& |B| + |\visFin{\mB \smi \mD_1}{x} \cup \deadOne{x}| + | \visInf{\mB \smi \mD_1}{x} \smi \deadTwo{x} | \leq 2|B|  \nonumber
+\end{align}
+Let us reduce the estimate to $\leq 2|B|-1$:
+\li
+  \- assume that $\deadTwo{x} = \emptyset$ 
+     (otherwise, Eq.\ref{disj:eq:1} and the sets disjointness give $2|B|-1$);
+     and
+
+  \- assume that $ \visFin{\mB \smi \mD_1}{x} \neq \emptyset$ 
+     (the other case together with eq.\ref{disj:eq:2}, 
+      the sets disjointness, and the first item gives $2|B|-1$);
+
+  \- hence, the construction in step (d) evacuates the process in 
+     $q \in \visFin{\mB \smi \mD_1}{x}$ 
+     into 
+     $ \visInf{\mB \smi \mD_1}{x} \smi \deadTwo{x}$. 
+     Hence modify step (c) of the construction 
+     and for $q$ devote a single process of $\cutoffsys$ that floods it. 
+     This will give $\leq 2|B|-1$.
+\il
+This concludes the proof.
+
+\end{proof}
+
+
+
+\begin{tightness}[Disj, Deadlocks, Fair]
+\label{obs:disj:fair_tight_deadlock}
+The cutoff $c=2|B|-1$ for deadlock detection in disjunctive systems on strong-fair or finite runs is tight.
+I.e., for any $k$ there are templates $(A,B)$ with $|B|=k$ such that:
+$$
+(A,B)^{(1,2|B|-2)} \textit{ does not have a deadlock, but } (A,B)^{(1,2|B|-1)} \textit { does}.
+$$
+\end{tightness}
+\begin{proof}
+Figure~\ref{gua:fig:tight_disj_dead_fair}
+shows process templates $(A,B)$ such that any system $\largesys$ with $n\leq 2|B|-2$ does not deadlock on strong-fair runs, but larger systems do.
+% 
+\begin{figure}[htpb]
+\centering
+\begin{subfigure}[b]{0.45\textwidth}\center
+\scalebox{0.75}{\input{guarded-systems/img/disj_tight_fair_deadlock_tmplA}}
+\label{fig:disj:tight_fair_deadlock_tmplA}
+\caption*{Template A}
+\end{subfigure}
+\begin{subfigure}[b]{0.45\textwidth}\center
+\scalebox{0.75}{\input{guarded-systems/img/disj_tight_fair_deadlock_tmplB}}
+\caption*{Template B}
+\end{subfigure}
+\caption{Templates $(A,B)$ used in Tightness~\ref{obs:disj:fair_tight_deadlock}.}
+\label{gua:fig:tight_disj_dead_fair}
+\end{figure}
+% 
+\end{proof}

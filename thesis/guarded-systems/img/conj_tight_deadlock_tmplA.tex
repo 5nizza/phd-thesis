@@ -1,0 +1,13 @@
+% !TEX root = table.tex
+\begin{tikzpicture}[node distance=2.3cm,inner sep=1pt,minimum size=0.5mm,->,>=latex]
+
+
+\node[initial left, state] (init) {};
+
+\path (init) [loop right] edge [right] node {$\forall\neg 1_B$} (init);
+\path (init) [loop right,dotted,distance=26mm] edge [right] node {...} (init);
+\path (init) [loop right,distance=38mm] edge [right] node {$\forall\neg k_B$} (init);
+
+
+\end{tikzpicture}
+  

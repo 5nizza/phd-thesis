@@ -1,0 +1,67 @@
+\begin{tikzpicture}
+	\begin{pgfonlayer}{nodelayer}
+		\node [style=invisible] (0) at (1, 1) {...};
+		\node [initial below, style=wn] (1) at (0, 0.5) {$\bar g$};
+		\node [style=wn] (2) at (-2, 1) {$g$};
+		\node [style=wn] (3) at (-3, 2) {$g$};
+		\node [style=wn] (4) at (-1, 2) {$\bar g$};
+		\node [style=wn] (5) at (-0.5, 3) {$\bar g$};
+		\node [style=wn] (6) at (-1.5, 3) {$g$};
+		\node [style=wn] (7) at (-2.5, 3) {$\bar g$};
+		\node [style=wn] (8) at (-3.5, 3) {$g$};
+		\node [style=wn] (9) at (-3.75, 4) {$g$};
+		\node [style=wn] (10) at (-3.25, 4) {$\bar g$};
+		\node [style=wn] (11) at (-2.75, 4) {$g$};
+		\node [style=wn] (12) at (-2.25, 4) {$\bar g$};
+		\node [style=wn] (13) at (-1.75, 4) {$g$};
+		\node [style=wn] (14) at (-1.25, 4) {$\bar g$};
+		\node [style=wn] (15) at (-0.75, 4) {$g$};
+		\node [style=wn] (16) at (-0.25, 4) {$\bar g$};
+		\node [style=textual] (17) at (-0.75, 0.25) {$\color{blue}{_{q_0 \mapsto (q_1,r)}}$};
+		\node [style=textual] (18) at (-0.75, -0) {$_{q_0' \mapsto (q_0',r)}$};
+		\node [style=textual] (19) at (-2.75, 0.75) {$\color{blue}{_{q_1 \mapsto (q_2,r)}}$};
+		\node [style=textual] (20) at (-2.75, 0.5) {$\color{DeepPink}{_{q_0 \mapsto (q_1,r)}}$};
+		\node [style=textual] (21) at (-2.75, 0.25) {$_{q_0' \mapsto (q_0',r)}$};
+		\node [style=textual] (22) at (-4, 2) {$\color{blue}{_{q_2 \mapsto (q_3,r)}}$};
+		\node [style=textual] (23) at (-4, 1.75) {$\color{DeepPink}{_{q_1 \mapsto (q_2,r)}}$};
+		\node [style=textual] (24) at (-4, 1.25) {$_{q_0' \mapsto (q_0',r)}$};
+		\node [style=textual] (25) at (-4.5, 3.25) {$\color{DeepPink}_{q_2 \mapsto (q_3,\bar r)}$};
+		\node [style=textual] (26) at (-4.5, 3.5) {$\color{blue}_{q_3 \mapsto (q_3,\bar r)}$};
+		\node [style=textual] (27) at (-4.5, 2.5) {$_{q_0' \mapsto (q_0',r)}$};
+		\node [style=textual] (28) at (-4, 1.5) {$\color{Green}{_{q_0 \mapsto (q_1,r)}}$};
+		\node [style=textual] (29) at (-4.5, 3) {$\color{Green}_{q_1 \mapsto (q_2,r)}$};
+		\node [style=textual] (30) at (-4.5, 2.75) {$\color{DarkGoldenrod}{_{q_0 \mapsto (q_1,r)}}$};
+		\node [style=textual] (31) at (-0.75, -0.25) {$_{p_{\sf EX}, p_{\sf EG}}$};
+		\node [style=textual] (32) at (-2.75, -0) {$_{p_{\sf EX}}$};
+		\node [style=textual] (33) at (-4, 1) {$_{p_{\sf EX}}$};
+		\node [style=textual] (34) at (-4.5, 2.25) {$_{p_{\sf EX}}$};
+	\end{pgfonlayer}
+	\begin{pgfonlayer}{edgelayer}
+		\draw [style=arrow] (1) to node{} (0);
+		\draw [style=arrow] (4) to (5);
+		\draw [style=arrow] (4) to (6);
+		\draw [style=arrow] (3) to (7);
+		\draw [style=dashed arrow] (3) to (8);
+		\draw [style=blue, transform canvas={yshift=0.3mm,xshift=0.8mm}] (3) to (8);
+		\draw [style=pink, transform canvas={yshift=0.8mm,xshift=1.4mm}] (3) to (8);
+		\draw [style=green, transform canvas={yshift=-0.3mm,xshift=-0.5mm}] (3) to (8);
+		\draw [style=dashed arrow, in=-45, out=135, looseness=0.75] (2) to node{} (3);
+		\draw [style=blue, transform canvas={yshift=0.7mm,xshift=0.7mm}] (2) to (3);
+		\draw [style=pink, transform canvas={yshift=1.3mm,xshift=1.3mm}] (2) to (3);
+		\draw [style=arrow] (2) to (4);
+		\draw [style=dashed arrow] (1) to node[right]{} (2);
+		\draw [style=blue, transform canvas={yshift=0.7mm,xshift=0.1mm}] (1) to (2);
+		\draw [style=dashed arrow] (8) to (9);
+		\draw [style=green, transform canvas={xshift=-0.5mm,yshift=-0.1mm}] (8) to (9);
+		\draw [style=yellow, transform canvas={xshift=-1mm,yshift=-0.2mm}] (8) to (9);
+		\draw [style=arrow] (8) to (10);
+		\draw [style=blue, transform canvas={xshift=0.5mm,yshift=-0.1mm}] (8) to (10);
+		\draw [style=pink, transform canvas={xshift=1mm,yshift=-0.2mm}] (8) to (10);
+		\draw [style=arrow] (7) to (11);
+		\draw [style=arrow] (7) to (12);
+		\draw [style=arrow] (6) to (13);
+		\draw [style=arrow] (6) to (14);
+		\draw [style=arrow] (5) to (15);
+		\draw [style=arrow] (5) to (16);
+	\end{pgfonlayer}
+\end{tikzpicture}

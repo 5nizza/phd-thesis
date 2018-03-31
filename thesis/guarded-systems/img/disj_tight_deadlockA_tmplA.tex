@@ -1,0 +1,23 @@
+%!TEX root = table.tex
+\begin{tikzpicture}[node distance=1.8cm,inner sep=1pt,minimum size=0.5mm,->,>=latex]
+
+
+\node[state,double] (a_1) {};
+\node[state] (a_sink) [right of=a_1] {};
+\node[state] (a_r) [right of=a_sink] {};
+\node (dots) [right of=a_r] {$\ldots$};
+\node[state] (a_dead) [right of=dots] {};
+
+
+\path (a_1) edge [above] node {$\disj{sink}$} (a_sink);
+\path (a_sink) edge [above] node {$\disj{r}$} (a_r);
+\path (a_r) edge [above] node {$\disj{b_1}$} (dots);
+\path (dots) edge [above] node {$\disj{b_k}$} (a_dead);
+\path (a_dead) [loop above] edge [right] node {$\disj{r}$} (a_dead);
+
+
+\path (a_1) [loop above] edge [right] node {} (a_1);
+\path (a_sink) [loop above] edge [right] node {} (a_sink);
+\path (a_r) [loop above] edge [right] node {} (a_r);
+
+\end{tikzpicture}

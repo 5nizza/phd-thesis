@@ -1,0 +1,40 @@
+\section{Related Work} \label{gua:sec:related}
+\ak{ cite ``Parameterized Model-Checking of Timed Systems with Conjunctive Guards'' and another Sasha's paper that contain results for disj guards (including undec result for some CTL*-like logic). }
+
+In this work we extend the results of Emerson and Kahlon~\cite{Emerson00} who study PMC of guarded protocols, but do not support fairness assumptions, nor provide cutoffs for 
+deadlock detection.
+In \cite{EmersonK03} they extended their work to systems with limited forms of guards and broadcasts, and also proved undecidability 
+of PMC of conjunctive guarded protocols wrt.\ $\LTL$ (including $\nextt$), 
+and undecidability wrt.\ $\LTLmX$ for systems with both 
+conjunctive and disjunctive guards.
+
+Bouajjani et al.~\cite{Bouajjani08} study parameterized model checking of
+resource allocation systems (RASs). Such systems have a bounded number of resources, 
+each owned by at most one process at any time. Processes are pushdown automata, 
+and can request resources with high or normal priority.
+RASs are similar to conjunctive guarded protocols in that certain
+transitions are disabled unless a processes has a certain resource. 
+RASs without priorities and where all the processes are finite state Moore machines can 
+be converted to conjunctive guarded protocols (at the price of blow up), 
+but not vice versa.
+The authors study parameterized model checking wrt.\ $\LTLmX$ properties under certain fairness assumptions,
+and deadlock detection.
+%The authors study parameterized model checking wrt.\ $\LTLmX$ properties on arbitrary or on strong-fair runs,
+%and (local or global) deadlock detection.
+Their proofs are based on ideas of~\cite{Emerson00} (our proofs are also based on ideas of~\cite{Emerson00}).
+ 
+German and Sistla~\cite{German92} considered global deadlocks and strong fairness properties for systems with pairwise rendezvous communication in a clique.
+In such systems, processes communicate pairwise using messages:
+one process sends a message and blocks until another process reads the message.
+Emerson and Kahlon~\protect\cite{EmersonK03} have shown that disjunctive guard systems can be reduced to such pairwise rendezvous systems.
+However, German and Sistla \cite{German92} do not provide cutoffs, 
+nor do they consider deadlocks for individual processes,
+and their specifications can talk about one process only.
+%
+Aminof et al.~\cite{AminofKRSV14} have 
+recently extended these results to more general topologies, and have 
+shown that for some decidable parameterized model checking problems there are no cutoffs,
+even in cliques.
+\ak{update the paragraphs, they also have some results on disj?}
+
+Many of the decidability results above have been surveyed in our book~\cite{BloemETAL15}.

@@ -1,0 +1,89 @@
+\section{Proof Structure}\label{gua:sec:proof-structure}
+
+The proofs for the cutoff results, new and original,
+are based on two lemmas, Monotonicity and Bounding~\cite{Emerson00}.
+When combined together, the lemmas give a cutoff.
+We state the lemmas, and discuss them in the context of deadlock detection and fairness.
+The detailed proofs are in Sections~\ref{gua:sec:proofs-disj} and \ref{gua:sec:proofs-conj}.
+Note that we only consider properties of the form $h(A,B^{(1)})$---the
+proof ideas extend to general properties $h(A,B^{(k)})$ without difficulty.
+Similarly, in most cases the proof ideas extend to open systems
+without major difficulties---mainly because when we construct a simulating
+run, we have the freedom to choose the input that is needed.
+% AK: in the main text of the paper no difficulties are seen
+Only for the case of deadlock detection we have to handle open systems explicitly.
+
+\smallskip
+\noindent
+{\bf 1) Monotonicity lemma:} if a behavior is possible in a (conjunctive or disjunctive) system with $n \in \Nat$ copies of $B$,
+then it is also possible in a (conjunctive or disjunctive resp.) system with one additional process:
+\[
+\largesys \models \pexists h(A,B^{(1)}) 
+~\implies~
+(A,B)^{(1, n+1)} \models \pexists h(A,B^{(1)}), 
+\]
+and if a deadlock is possible in $(A,B)^{(1, n)}$, then it is possible in $(A,B)^{(1, n+1)}$.
+%
+
+\parit{Discussion}
+The lemma is easy to prove for properties 
+$\pexists h(A,B^{(1)})$ in both disjunctive and conjunctive systems, by letting the 
+additional process stay in its initial state $\init_B$ forever (see~\cite{Emerson00}).
+This cannot disable transitions with disjunctive guards, as
+these check for \emph{existence} of a local state in another process (and we 
+do not remove any processes), and it cannot disable conjunctive guards since 
+they contain $\init_B$ by assumption. 
+However, this construction violates fairness, since the new process
+never moves. This can be resolved in the disjunctive case by letting the
+additional process mimic all transitions of an existing process. But in
+general this does not work in conjunctive systems (due to the non-reflexive
+interpretation of guards).
+For this case and for deadlock detection, the proof is not
+trivial and may only work for $n \geq c$, for some lower bound $c \in \Nat$.
+The following sections provide the details.
+
+
+\smallskip
+\noindent
+{\bf 2) Bounding lemma:} there exists a number $c \in \Nat$ such that
+a behavior is possible in a system with $c$ copies of $B$ if it is possible in a system with
+$n \geq c$ copies of process $B$:
+\[
+(A,B)^{(1, c)} \models \pexists h(A,B^{(1)})
+~\impliedby~
+(A,B)^{(1, n)} \models \pexists h(A,B^{(1)})
+,
+\]
+and a deadlock is possible in \cutoffsys if it is possible in \largesys.
+
+\parit{Discussion}
+For disjunctive systems,
+the main difficulty is that removing processes
+might falsify guards of the local transitions of $A$ or $B_1$ in a given run.
+To address this,
+Emerson and Kahlon~\cite{Emerson00} came up with so-called flooding construction (described later).
+For conjunctive systems,
+removing processes from a run is easy for the case of infinite runs,
+since a transition that was enabled before cannot become disabled.
+Here, the difficulty is in preserving deadlocks,
+because removing processes may enable processes that were deadlocked before.
+The next sections explain how to address this.
+
+\parbf{Tightness}
+Recall from Section~\ref{gua:sec:paramsynt} that
+$c$ is a tight cutoff iff $c$ is a cutoff and there are templates $(A,B)$ and a property $\Phi$,
+such that
+$$\sys{c-1} \not\models \Phi \textit{ and } \sys{c} \models \Phi.$$
+For deadlock detection this is equivalent to:
+$\sys{c-1}$ does not have a deadlock but $\sys{c}$ does.
+%For properties of the form $\E h(A,B^{(1)})$ and $\A h(A,B^{(1)})$,
+%due to the equivalence ``$\sys(n) \models \E h$'' $\equiv$ ``$\sys{n} \not\models \A\neg h$'',
+%this is equivalent to having:
+%$\sys{c-1} \not\models \E h(A,B^{(1)})$ and $\sys{c} \models \E h(A,B^{(1)})$.
+To prove tightness, we provide a template $(A,B)$ and a property.
+
+The next sections contains all the proofs of the results in the table.
+For each row and column, we prove monotonicity and bounding lemmas,
+as well as tightness.
+Note that for simplicity the proofs are for the case of $h(A,B_1)$,
+while the generalization to the case $h(A,B^{(k)})$ follows.

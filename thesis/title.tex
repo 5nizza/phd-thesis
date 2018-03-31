@@ -1,0 +1,181 @@
+\pagenumbering{gobble}
+
+\begin{titlepage}
+\newgeometry{hmargin=1cm,vmargin=2cm,centering}
+\begin{center}
+\vspace*{2cm}
+{\LARGE Dissertation}\\
+
+\vspace{8mm}
+{\Huge \bf Reactive Synthesis:}
+
+\vspace{3mm}
+%{\bf \huge {$\frak b$ranching~logic~{\!\LARGE\&\!}~parameter\emph{i}sed~systems}}
+%{\bf \huge {$\frak{branching}$~logic~{\!\LARGE\&\!}~parameter\emph{i}sed~systems}}
+%{\bf \huge {branc$\frak h$ing~logic~{\LARGE\&}~parameter\emph{i}sed~systems}}
+{\bf \huge {branching~logic~{\LARGE\&}~parameter\emph{i}zed~systems}}
+\vspace{8mm}
+
+{\LARGE Ayrat Khalimov}
+
+\vspace{1cm}
+
+{\large
+\begin{tabular}{rl}
+Advisor:    & Roderick Bloem \\&Graz University of Technology, Austria\\[0.5ex]
+Reviewer: & Sven Schewe \\&University of Liverpool, UK\\
+Dean of Studies: & Denis Helic\\&Graz University of Technology, Austria\\
+\end{tabular}}
+
+\vfill
+
+\begin{figure}[!ht]
+\centerline{\includegraphics[width=3.3cm,keepaspectratio=true]{figures/title/tug}}
+\end{figure}
+
+{\large
+Institute for Applied Information Processing and Communications\\
+Graz University of Technology\\
+A-8010 Graz, Austria\\
+}
+
+{\large Januar 2018}
+\end{center}
+
+%\noindent
+%\underline{\hspace*{3cm}}\\
+%{\footnotesize \copyright ~ Copyright 2017 by the author}
+
+\end{titlepage}
+
+\restoregeometry
+
+\cleardoublepage
+
+\pagestyle{plain}
+\pagenumbering{roman}
+
+%\vspace*{0.2cm}
+
+\begin{center}
+{\Large\bfseries Acknowledgements}
+\end{center}
+This work would not be possible without RiSE network (established by Roderick Bloem and \boxed{\text{Helmut Veith}}).
+I stumbled upon the poster with the PhD position by chance,
+during a relaxed walk at EPFL where I was doing an internship.\\
+I am grateful to my advisor Roderick Bloem,
+who honestly answered my questions, patiently directed me by asking questions and pitching ideas,
+and who always listened.
+Sasha Rubin showed how to be rigid and develop theories,
+with Swen Jacobs we wondered a lot around parameterised synthesis bouncing the token from each other,
+and Sven Schewe convinced me that tree automata are easy-peasy.\\
+My colleagues Robert K\"onighofer, Georg Hofferek, and Bettina K\"onighofer helped
+in the initial integration and changed my attitude towards people outside of Russia.
+Our secretaries Martina Piewald, Melanie Blauensteiner, Ursula Urwanisch, and Angelika Wagner
+enabled me to focus on my work without administrative distractions.\\
+Dedicated to my grandfather Rauf and our large family.
+
+\cleardoublepage
+
+%\vspace{5cm}
+\begin{center}
+{\Large\bfseries Statutory Declaration}
+\end{center}
+\vspace{5mm}
+\noindent
+I declare that I have authored this thesis independently, that I have
+not used other than the declared sources/resources, and that I have
+explicitly marked all material which has been quoted either literally
+or by content from the used sources.
+
+\vspace{2cm}
+
+\noindent
+\begin{tabular}{ccc}
+\hspace*{5cm}     & \hspace*{1.5cm}   & \hspace*{5.7cm}\\
+\dotfill          &                 & \dotfill\\
+place, date       &                 & signature\\
+\end{tabular}
+
+
+
+% --- English Abstract --------------------------------------------------
+
+
+\cleardoublepage
+
+
+%\begin{changemargin}{1.4cm}{1.4cm}
+
+\begin{center}
+{\Large\bfseries Abstract}
+\end{center}
+%\vspace*{1mm}
+Reactive synthesis is an automatic way
+to translate a human intention expressed in some logic
+into a system of some kind.
+This thesis has two parts, devoted to logic and to systems.
+
+\parbf{Part I}
+In 1963 Alonzo Church introduced the synthesis problem~\cite{Church63}
+for specifications in monadic second-order logic.
+%Later Amir Pnueli introduced linear temporal logic (LTL)~\cite{pnueli1977temporal}.
+Nowadays most model checkers and synthesizers use linear temporal logic (LTL)~\cite{pnueli1977temporal}.
+LTL reasons about system runs in a linear fashion.
+With LTL we can ask ``does a run reach a particular state?'' or
+``does a run visits a particular state infinitely often?''.
+LTL is linear in its nature, leaving the designer without structural properties,
+which are expressible in computation tree logic (CTL) and its generalization \CTLstar~\cite{ctl-origin,ctlstar-origin}.
+%\CTLstar and CTL were introduced by Emerson and Halpern and Clarke~\cite{ctl-origin,ctlstar-origin}.
+With \CTLstar we can ask
+``does a run never visit a particular state but it has a \emph{possibility}
+  to reach it?''.
+Such properties are important---they allow for fine-tuning the system structure.
+
+In Part I, we develop two new approaches to \CTLstar synthesis.
+The first approach is an extension (actually, two) of
+the SMT-based bounded synthesis~\cite{BS}.
+We describe two extensions:
+one follows bottom-up \CTLstar model checking,
+another one follows the automata framework~\cite{ATA}.
+Then we develop the approach that reduces \CTLstar synthesis to LTL synthesis.
+The reduction turns any LTL synthesiser into a \CTLstar synthesiser.
+The approaches were implemented and are available online.
+
+\parbf{Part II}
+Modern systems become more and more distributed.
+Such distributed systems are typically parameterized by the number of processes:
+they should work for any number of processes.
+The parameterized synthesis problem~\cite{JB14} asks,
+given a parameterized specification, to find a process template,
+that can be cloned to form a correctly behaving system of any size.
+At the core of the method is the cutoff reduction technique:
+reduce reasoning about systems with an arbitrary number of processes
+to reasoning about systems of a fixed cutoff size.
+The intrinsic parameter, hidden in the parameterized synthesis problem,
+is how the processes are connected and how they communicate,
+i.e., the system architecture.
+
+In Part II, we study parameterized synthesis for two system architectures.
+The first architecture is guarded systems~\cite{EmersonK03}
+and is inspired by cache coherence protocols.
+In guarded systems,
+processes transitions are enabled or disabled depending on the existence of other processes in certain local states.
+The existing cutoff results~\cite{EmersonK03} for guarded protocols
+are restricted to closed systems, and are of limited use for liveness properties.
+We close these gaps and prove tight cutoffs for open systems
+with liveness properties, and also cutoffs for detecting deadlocks.
+
+The second architecture is token-ring systems~\cite{Emerso03},
+where the single token circulates processes arranged in a ring.
+The experiments with the existing parameterized synthesis method~\cite{JB14}
+showed that it does not scale to large specifications.
+First, we optimize the method by refining the cutoff reduction,
+using modularity and abstraction.
+The evaluation show several orders of magnitude speed-ups.
+Second, we perform parameterized synthesis case study on the industrial arbiter protocol AMBA~\cite{AMBAspec}.
+We describe new tricks%
+---a new cutoff extension and decompositional synthesis---%
+that, together with the previously described optimizations, allowed us to synthesize AMBA
+in a parameterized setting, for the first time.
+

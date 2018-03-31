@@ -1,0 +1,30 @@
+\begin{tikzpicture}
+	\begin{pgfonlayer}{nodelayer}
+		\node [style=gn, initial, double] (0) at (0, -0) {$q_0'$};
+		\node [style=gn] (1) at (2, -0) {$q_1$};
+		\node [style=uptriangle] (2) at (1, -0) {};
+		\node [style=gn] (3) at (4, -0) {$q_2$};
+		\node [style=gn] (4) at (6, -0) {$q_3$};
+		\node [style=gn, double] (5) at (8, -0) {$q_4$};
+		\node [style=uptriangle] (6) at (7, -0) {};
+		\node [style=uptriangle] (7) at (5, -0) {};
+		\node [style=uptriangle] (8) at (3, -0) {};
+		\node [style=uptriangle] (9) at (9, -0) {};
+		\node [style=uptriangle] (10) at (6, 1) {};
+	\end{pgfonlayer}
+	\begin{pgfonlayer}{edgelayer}
+		\draw [style=simple] (0) to node[below]{$_1$} (2);
+		\draw [style=arrow] (2) to node[below=]{$_{\sf E}$} (1);
+		\draw [style=arrow, bend right, looseness=1.00] (2) to node[above]{$_{\sf E}$} (0);
+		\draw [style=simple] (1) to node[above]{$_g$} (8);
+		\draw [style=simple] (3) to node[above]{$_g$} (7);
+		\draw [style=simple] (4) to node[above]{$_{\neg g}$} (6);
+		\draw [style=simple] (5) to node[below]{$_1$} (9);
+		\draw [style=arrow] (8) to node[above]{$_{\sf E}$} (3);
+		\draw [style=arrow] (7) to node[above]{$_{\sf E}$} (4);
+		\draw [style=arrow] (6) to node[above]{$_{\sf E}$} (5);
+		\draw [style=arrow, bend right, looseness=1.00] (9) to node[above]{$_{\sf E}$} (5);
+		\draw [style=simple, bend right, looseness=1.00] (4) to node[right]{$_g$} (10);
+		\draw [style=arrow, bend right, looseness=1.00] (10) to node[left]{$_{\sf E}$} (4);
+	\end{pgfonlayer}
+\end{tikzpicture}

@@ -1,0 +1,36 @@
+\chapter{Parameterized Guarded Systems} \label{chap:guarded-systems}
+\hfill {\footnotesize\textit{This chapter is based on joint work with S.Au{\ss}erlechner and S.Jacobs~\cite{AJK16,SimonThesis}~~~~~~~~}}
+
+
+\begin{quotation}
+\noindent\textbf{Abstract.}
+Guarded protocols were introduced in a seminal
+paper by Emerson and Kahlon (2000), and describe systems of processes whose transitions
+are enabled or disabled depending on the existence of other processes in
+certain local states.
+In this chapter we study parameterized model checking and synthesis of
+guarded protocols, both aiming at formal correctness arguments for systems with any number of processes. 
+Cutoff results reduce reasoning about systems with an arbitrary 
+number of processes to systems of a determined, fixed size. Our work stems 
+from the observation that existing cutoff results for guarded protocols
+(i) are restricted to closed systems, and
+(ii) are of limited use for liveness properties because reductions do not preserve fairness.
+We close these gaps and obtain new cutoff results for open systems with liveness properties under
+fairness assumptions.
+Furthermore, we obtain cutoffs for the detection of global and local deadlocks,
+which are of paramount importance in synthesis.
+Finally, we prove tightness or asymptotic tightness for the new cutoffs.
+\end{quotation}
+
+
+\input{guarded-systems/macros}
+\input{guarded-systems/intro}
+\input{guarded-systems/related}
+\input{guarded-systems/prelim}
+\input{guarded-systems/reduction-cutoff}
+\input{guarded-systems/cutoffs}
+\input{guarded-systems/proof-structure}
+\input{guarded-systems/proofs-disj}
+\input{guarded-systems/proofs-conj}
+%\input{guarded-systems/experiments}
+\input{guarded-systems/conclusion}

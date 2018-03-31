@@ -1,0 +1,25 @@
+% !TEX root = table.tex
+\begin{tikzpicture}[node distance=2.5cm,inner sep=1pt,minimum size=0.5mm,->,>=latex]
+% \tikzset{every state/.style={circle,minimum size=.5cm,inner sep=.03cm}}
+
+
+\node[state,initial left] (b_1) {$1_B$};
+\node (dots) [right of=b_1] {$\ldots$};
+\node[state] (b_k) [right of=dots] {$k_B$}; 
+\node[state] (r) [below=0.8cm of dots] {};
+
+\path (b_1) edge [above] node {$\disj{1_B}$} (dots);
+\path (dots) edge [above] node {$\disj{{k-1}_B}$} (b_k);
+\path (b_1) edge [bend right=15] node {} (r);
+\path (b_k) edge [bend left=15] node {} (r);
+\path (dots) edge [above, dotted] node {} (r);
+
+\path (b_1) [loop above] edge [right] node {$\disj{1_B}$} (b_1);
+\path (b_k) [loop above] edge [right] node {$\disj{k_B}$} (b_k);
+\path (r) [loop below] edge [right] node {$\disj{r_A}$} (r);
+\path (dots) [loop above,dotted,in=60,out=120,distance=12mm] edge [right] node {} (dots);
+
+
+
+\end{tikzpicture}
+

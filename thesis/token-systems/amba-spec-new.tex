@@ -1,0 +1,50 @@
+\[
+{
+\footnotesize
+\begin{array}{llrlr}
+% \forall \mathrm i: & \always & (\hmastlocki \land (\hburst = \hincr) \land \hmasteri) \rightarrow \nextt \eventually \neg \hbusreqi & (A1)\\[3pt]
+\multicolumn{4}{l}{\text{Assumptions $\Phi(i)$:}} \\[2pt]
+%  & \always\eventually & \hready & (A2) \\[3pt]
+%& & \multicolumn{1}{l}{\hready \textit{ is global}} \\[3pt]
+% \hready \ \ \text{is global} & & & \\[3pt]
+& & \G & ((\hmastlocki \land (\hbursti = \hincr) \land \hmasteri) \rightarrow \nextt \eventually \neg \hbusreqi) & (A1) \\[3pt]
+& & \G\F & \hreadyi & (A2) \\[3pt]
+& & \G & \hlocki \rightarrow \hbusreqi & (A3) \\[3pt]
+& & & \neg \hbusreqi \land \neg \hlocki \land \neg \hreadyi & (A4) \\[5pt]
+%& & \always & \eventually \toki & (A5) \\[3pt]
+
+\multicolumn{4}{l}{\text{Guarantees $\Psi(i)$:}} \\[3pt]
+& & \always & \neg \hreadyi \rightarrow \nextt \neg \hstarti & (G1) \\[3pt]
+& & \always & (\hmastlocki \land \hbursti = \hincr \land \hstarti)\\
+& & & ~\rightarrow \nextt (\neg \hstarti \weakuntil (\neg \hstarti \land \hbusreqi)) & (G2) \\[3pt]
+& & \always & (\hmastlocki \land \hbursti = \hburstfour \land \hstarti \land \hreadyi)\\
+& & & ~\rightarrow \nextt (\neg \hstarti \weakuntil[3] (\neg \hstarti \land \hreadyi)) & (G3.1) \\[3pt]
+& & \always & (\hmastlocki \land \hbursti = \hburstfour \land \hstarti \land \neg \hreadyi)\\
+& & & ~\rightarrow \nextt (\neg \hstarti \weakuntil[4] (\neg \hstarti \land \hreadyi)) & (G3.2) \\[3pt]
+& & \always & \hreadyi \rightarrow (\hgranti \leftrightarrow \nextt \hmasteri) & (G4)\\[3pt]
+& & \always & \hreadyi \rightarrow (\hlockedi \leftrightarrow \nextt \hmastlocki) & (G5)\\[3pt]
+& & \always & \nextt \neg \hstarti \impl \left(
+\begin{array}{ll}
+ & \hmasteri \leftrightarrow \nextt \hmasteri\\
+\land & \hmastlocki \leftrightarrow \nextt \hmastlocki
+\end{array}
+ \right) & (G6)\\[3pt]
+& & \always & (\hdecidei \land \nextt \hgranti) \rightarrow (\hlocki \leftrightarrow \nextt \hlockedi) & (G7)\\[3pt]
+
+& & \always & \neg \hdecidei\ \impl \left(
+\begin{array}{ll}
+       & \hgranti \leftrightarrow \nextt \hgranti \\
+ \land & \hlockedi \leftrightarrow \nextt \hlockedi
+\end{array}
+\right) & (G8)\\[3pt]
+
+
+
+
+& & \always & \hbusreqi \impl \eventually (\neg
+\hbusreqi \lor \hmasteri) & (G9)\\[3pt]
+& & \always & \neg \hgranti \impl (\neg \hgranti \weakuntil \hbusreqi) & (G10.1)\\[3pt]
+% \forall \mathrm i: & \always & (\hdecidei \land (\forall \mathrm i: \neg \hbusreqi)) \impl \nextt \hgrant[0] & (G10.2) \\[3pt]
+& & & \neg \hgranti \land \neg \hmastlocki & (G11.1) \\[3pt]
+& & \always & \hgranti \impl \toki & (G12)
+\end{array}}\]

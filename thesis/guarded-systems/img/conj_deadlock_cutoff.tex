@@ -1,0 +1,36 @@
+\begin{tikzLTS}
+      \tikzstyle{state} = [circle,draw=black,thick,inner sep=1.5pt, text width={width("$\text{T}_{i-1}$")}, align=center]
+      \tikzstyle{boxLabel} = [yshift=-0.4cm]
+      \tikzstyle{every node} = [node distance=3cm]
+
+  \node[state] (A) [] {$\text{init}$};
+  \node[] (B) [below of=A, node distance=2.5cm] {$$};
+  \node[state] (C) [left of=B, node distance=3.5cm] {$1$};
+  \node[state] (D) [right of=C] {$2$};
+  \node[] (B) [below of=A] {$$};
+  \node[] (E) [right of=D] {$$};
+  \node[] (E') [below of=E,node distance=0.75cm] {$$};
+  \node[node distance=1cm] (F) [right of=E] {$$};
+  \node[state] (G) [right of=F] {$n$};
+  
+\pgfmathsetmacro{\shift}{0.3ex}
+
+\draw [post] (A.185) -- node[above] {} (C.80);
+\draw [pre] (A.210) -- node[below right] {$\neg 1$} (C.55);
+
+\draw [post] (A.245) -- node[above] {} (D.90);
+\draw [pre] (A.270) -- node[below right] {$\neg 2$} (D.65);
+
+\draw [post] (A.325) -- node[above] {} (G.150);
+\draw [pre] (A.350) -- node[above right] {$\neg n$} (G.125);
+  
+  \path (C) edge [right,post] node [above] {$\neg 2$} (D);
+  \path (D) edge [right,post] node [above] {$\neg 3$} (E);
+  \path ($(E)-(0.05,0)$) edge [right,dotted,-] node [above] {} ($(F)+(0.05,0)$);
+  \path (F) edge [right,post] node [above] {$\neg n$} (G);
+  
+  \path (G) edge [bend left,post] node [above] {$\neg 1$} (C);
+  
+   \node (U2) [draw=black, fit=(A) (C) (G) (E'), inner sep=0.75cm] {};
+   \node [boxLabel] at (U2.north) {Template $B$};
+\end{tikzLTS}

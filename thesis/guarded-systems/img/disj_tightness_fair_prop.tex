@@ -1,0 +1,60 @@
+\begin{tikzLTS}
+      \tikzstyle{state} = [circle,draw=black,thick,inner sep=1.5pt, text width={width("$\text{init}_1$")}, align=center]
+      \tikzstyle{boxLabel} = [yshift=-0.4cm]
+
+    \newcommand{\rad}{2 }
+    \draw[draw=white] (0,0) circle (3);
+    \foreach \x[remember=\x as \lastx] in {1,2,...,5}{
+      \ifnum \x < 4
+      \node[state] (t\x) at ($(0,0)+({-72*(\x-2)+18}:\rad and \rad)$) {$a_\x$};
+      \else
+       \ifnum \x = 4
+         \coordinate (t\x) at ($(0,0)+({-72*(\x-2)+18}:\rad and \rad)$) ;
+        \else
+         \node[state] (t\x) at ($(0,0)+({-72*(\x-2)+18}:\rad and \rad)$) {$a_{|T_B|}$};
+        \fi
+      \fi
+    }
+
+    \coordinate (t34) at ($(0,0)+({-72*(4-2)+36}:\rad and \rad)$) ;
+    \coordinate (t44) at ($(0,0)+({-72*(4-2)-0}:\rad and \rad)$) ;
+
+      \path (t1) [post,bend left] edge node[above right] {$\disj{b_1}$} (t2);
+      \path (t2) [post,bend left] edge node[below right] {$\disj{b_2}$} (t3);
+      \path (t3) [post,bend left,dashed] edge node[below] {$\disj{b_3}$} (t34);
+      \path (t34) [bend left,dotted] edge (t44);
+      \path (t44) [post,bend left,dashed] edge node[above right] (e34-44) {$\disj{b_{|T_B|-1}}$} (t5);
+      \path (t5) [post,bend left] edge node[above left] {\disj{b_{|T_B|}}} (t1);
+
+	 \node (U1) [draw=black, fit=(t1) (t2) (t3) (t4) (t5) (t34) (t44), inner sep=0.75cm] {} ;
+	 \node [boxLabel] at (U1.north) {Template $A$};
+
+     \coordinate(tright) at (U1.east);
+     %\draw[black] ($(t5.west |- t1.north)-(1, -1)$) rectangle ($(t2.east |- t3.south)+(1,-1)$);
+     %\path  ($(t5.west |- t1.north)-(1, -1.1)$) -- ($(t2.east |- t1.north)+(1, 1.1)$) node[midway,above] {$\mathcal{T}_1$};
+
+    \newcommand{\dist}{4 }
+    \node[state] (t1) at ($(tright |- t1)+(4,0)$) {$b_1$};
+    \node[state] (t2) at ($(tright |- t3)+(\dist/2,0.5)$) {$b_2$};
+    \node[state] (t3) at ($(tright |- t3)+(\dist/2+2,0.5)$) {$b_3$};
+    \node (ti) at ($(tright |- t3)+(\dist/2+3.5,0)$) {\dots\dots};
+    \node[state] (t5) at ($(tright |- t3)+(\dist/2+5,0)$) {$b_k$};
+
+    \path (t1) edge[post,loop left] node[left] {\disj{b_1}} (t1)
+              (t1) edge[post]  (t2)
+              (t1) edge[post]  (t3)
+              (t1) edge[post]  (t5)
+%               (t1) edge[post] node[above left] {$|T_B|$} (t2)
+%               (t1) edge[post] node[above right] {$|T_B|$} (t3)
+%               (t1) edge[post] node[above right] {$|T_B|$} (t5)
+              (t2) edge[post,loop below] node[below] {\disj{b_2}} (t2)
+              (t3) edge[post,loop below] node[below] {\disj{b_3}} (t3)
+              (t5) edge[post,loop below] node[below] {\disj{b_k}} (t5);
+
+	 \coordinate(U1bottom) at ($(t2 |- U1.south)+(0,0.75)$);
+     \node (U2) [draw=black, fit=(t1) (t2) (t3) (ti) (t5) (U1bottom), inner sep=0.75cm] {} ;
+	 \node [boxLabel] at (U2.north) {Template $B$};;
+
+
+
+\end{tikzLTS}

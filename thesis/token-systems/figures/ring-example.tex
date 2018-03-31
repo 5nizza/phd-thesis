@@ -1,0 +1,46 @@
+\begin{tikzpicture}
+	\begin{pgfonlayer}{nodelayer}
+		\node [style=text ellipse] (0) at (0, 1.5) {1};
+		\node [style=text ellipse] (1) at (1.5, -0) {2};
+		\node [style=text ellipse] (2) at (-1.5, -0) {4};
+		\node [style=text ellipse] (3) at (0, -1.5) {3};
+		\node [style=invisible] (4) at (0, 2.5) {};
+		\node [style=invisible] (5) at (-1.5, 1) {};
+		\node [style=invisible] (6) at (-1.5, -1) {};
+		\node [style=invisible] (7) at (0, -0.5) {};
+		\node [style=invisible] (8) at (0, -2.5) {};
+		\node [style=invisible] (9) at (1.5, 1) {};
+		\node [style=invisible] (10) at (1.5, -1) {};
+		\node [style=invisible] (11) at (0, 0.5) {};
+		\node [style=textual] (12) at (0.75, 1.25) {$~~_{\tsnd_1}$};
+		\node [style=textual] (13) at (0.25, 2.25) {$_{r_1}$};
+		\node [style=textual] (14) at (-0.75, 1.25) {$_{\trcv_1}$};
+		\node [style=textual] (15) at (1.75, 0.75) {$_{r_2}$};
+		\node [style=textual] (16) at (1.75, -0.75) {$_{g_2}$};
+		\node [style=textual] (17) at (1, -0.5) {$_{\tsnd_2}~~$};
+		\node [style=textual] (18) at (0.75, -1.5) {$_{\trcv_3}$};
+		\node [style=textual] (19) at (0.75, 0.5) {$~_{\trcv_2}$};
+		\node [style=textual] (20) at (-1, 0.5) {$~~~_{\tsnd_4}$};
+		\node [style=textual] (21) at (-1, -0.5) {$~_{\trcv_4}$};
+		\node [style=textual] (22) at (-0.75, -1.25) {$_{\tsnd_3}$};
+		\node [style=textual] (23) at (-1.75, 0.75) {$_{r_4}$};
+		\node [style=textual] (24) at (-1.75, -0.75) {$_{g_4}$};
+		\node [style=textual] (25) at (0.25, -2.25) {$_{g_3}$};
+		\node [style=textual] (26) at (0.25, -0.75) {$_{r_3}$};
+		\node [style=textual] (27) at (0.25, 0.75) {$_{g_1}$};
+	\end{pgfonlayer}
+	\begin{pgfonlayer}{edgelayer}
+		\draw [style=arrow, bend left=15, looseness=1.00] (0) to (1);
+		\draw [style=arrow, bend left=15, looseness=1.00] (1) to (3);
+		\draw [style=arrow, bend left=15, looseness=1.00] (3) to (2);
+		\draw [style=arrow, bend left=15, looseness=1.00] (2) to (0);
+		\draw [style=arrow, label=df] (4) to (0);
+		\draw [style=arrow] (5) to (2);
+		\draw [style=arrow] (2) to (6);
+		\draw [style=arrow] (9) to (1);
+		\draw [style=arrow] (1) to (10);
+		\draw [style=arrow] (7) to (3);
+		\draw [style=arrow] (3) to (8);
+		\draw [style=arrow] (0) to (11);
+	\end{pgfonlayer}
+\end{tikzpicture}

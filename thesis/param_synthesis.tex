@@ -1,0 +1,83 @@
+\part[Excursion into Parameterized Systems]{Excursion Into\\Parameterized Systems\\ \ \\ \LARGE Guarded and Token-ring Systems}
+
+\section*{Overview of Part II}
+
+Concurrent systems are hard to implement and even harder to debug.
+On the other side, they are relatively easy to specify.
+Consider, for example, the arbiter serving many clients.
+A possible specification is
+$
+  \forall i \neq j. \G \neg ( g_i \land g_j ) \land \G (r_i \impl \F g_i),
+$
+%\[
+%\begin{array}{ll}
+%  \forall i \neq j.~ & \G \neg ( g_i \land g_j ) \land \\
+%  \forall i.~ & \G (r_i \impl \F g_i),
+%  \end{array}
+%\]
+which says that, for every client, every request should be eventually granted,
+and the grants are mutually exclusive.
+If a human implements such an arbiter,
+he would try to come up with a basic block that handles a single client,
+and connect such a block into a system, that handles as many clients as needed.
+On the other side,
+the computer tries to synthesize a system as one monolithic block.
+This hides the insight that
+a system for $n+1$ clients is very similar to a system for $n$ clients.
+This leads to the scalability problem, once we require a large number of clients.
+
+The parameterized synthesis approach~\cite{JB14} addresses the issue.
+The idea is---just like the human would do---%
+to automatically synthesize a basic block that
+can be arranged into a system of any desired size.
+There are several ways to arrange such blocks into a system,
+depending on how they communicate with each other.
+In this thesis part we will look into two system architectures.
+
+The first architecture is inspired by cache coherence protocols found in modern processors.
+Such a protocol is described by states,
+where transitions between states happen depending on whether or not there is a processor in a particular state.
+I.e., the transitions are guarded.
+Chapter~\ref{chap:guarded-systems} studies guarded systems.
+
+The second kind of systems is token-ring systems.
+In such a system, the single token circulates in the system.
+A process possessing the token knows that no other process has the token.
+Based on this information, the process can, for example, raise the grant.
+If all processes raise the grant only when they posses the token,
+then the grants will be mutually exclusive.
+Chapter~\ref{chap:token-systems} studies token-ring systems.
+
+For both architectures we study their parameterized synthesis problems.
+The parameterized synthesis problems asks, given a parameterized specification,
+to find a process implementation,
+such that a system of any size composed of such processes,
+satisfies the specification.
+The solution to the seemingly difficult problem---we now ask for correctness of a system of \emph{any} size---is based on the cutoff reduction:
+to synthesize a process that works for all system sizes,
+it is enough to synthesize a process that works in a system of a cutoff size.
+For example, for the specification of the arbiter mentioned above,
+the cutoff for token-ring systems is 4.
+This means that it is enough to find a process implementation that
+works in a system with 4 such processes.
+Once we find it, a system of size 5, 6, 7,... is also correct.
+
+In Chapter~\ref{chap:guarded-systems} we prove cutoff results for guarded systems.
+Our results extend the results of Emerson and Kahlon~\cite{EmersonK03}.
+Our contribution concerns both parameterized synthesis and parameterized verification.
+We prove new cutoff results that are applicable to a previously unconsidered setting
+of open systems with liveness properties under fairness assumptions.
+We also prove new cutoff results for deadlock detection.
+The work is theoretical; it is yet to find its application.
+
+In Chapter~\ref{chap:token-systems} on token-ring systems,
+we extend the cutoffs of Emerson and Namjoshi~\cite{Emerso03}
+to a new setting of fully asynchronous systems and richer specifications.
+Then we apply them to an industrial arbiter protocol called AMBA.
+Thus, we synthesize for the first time the AMBA protocol in the parameterized sense.
+
+The chapters can be read in any order.
+
+\input{guarded-systems/main}
+
+\input{token-systems/main}

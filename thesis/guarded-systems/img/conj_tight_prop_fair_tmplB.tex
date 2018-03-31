@@ -1,0 +1,16 @@
+% !TEX root = table.tex
+\begin{tikzpicture}[node distance=1.5cm,inner sep=1pt,minimum size=0.5mm,->,>=latex]
+
+
+\node[state,initial left] (init) {${init}_B$};
+\node[state] (b_1) [right= of init] {$1_B$};
+\node[state] (b_2) [right= of b_1] {$2_B$}; 
+
+\path (init) edge [above] node {$\forall\neg 1_B$} (b_1);
+\path (b_1)  edge [above] node {$\forall\neg 1_A$} (b_2);
+\path (b_2)  [bend left=20] edge [below] node {$\forall\neg 2_B$} (init);
+
+
+
+\end{tikzpicture}
+  
