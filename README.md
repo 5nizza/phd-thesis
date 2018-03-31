@@ -1,6 +1,6 @@
-# Latex sources of my PhD thesis Reactive Synthesis: branching logics and paramterized systems
+# Latex sources of my PhD thesis Reactive Synthesis: branching logics and parameterized systems
 
-The sources do not represent a value perse,
+The sources do not represent a value per se,
 but, just in case, I upload them here.
 
 - The folder `thesis` contains the thesis. 
