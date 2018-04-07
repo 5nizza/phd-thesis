@@ -524,7 +524,9 @@ The next section shows how to handle this.
   \- Assume that every request is a locked request of type \hburstfour, i.e., 
      add the assumption $\always(\hlocki\land\hburst=\hburstfour)$ to the specification.
      This implicitly removes guarantee G2 and assumption A1 from the specification.
-     Synthesize the model. The resulting model has $10$ states (states $t0,..,t9$ and transitions between them in Figure~\ref{amba:fig:ith-model}).
+     Synthesize the model. The resulting model has $10$ states
+     (states $t0,..,t9$ with their outputs, as well as transitions between them that satisfy the added assumption,
+      are in Figure~\ref{amba:fig:ith-model}).
 
   \- Use the model found in the previous step as the basis:
      assert the number of states, values of output functions in these states, transitions for inputs that satisfy the previous assumption.
